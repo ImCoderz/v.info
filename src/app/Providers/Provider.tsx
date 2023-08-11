@@ -2,7 +2,7 @@
 import React from 'react'
 import {SessionProvider} from "next-auth/react"
 import {NextUIProvider} from '@nextui-org/react'
-import MyNavbar from '../components/MyNavbar'
+import MyNavbar from '../components/home/MyNavbar'
 
 interface Props{
     children?:React.ReactNode

@@ -3,8 +3,8 @@ import React,{useRef,useState} from 'react'
 import {Avatar} from "@nextui-org/react";
 import {Input} from "@nextui-org/react";
 import {signIn }from "next-auth/react"
-import {EyeFilledIcon} from "../../components/EyeFilledIcon";
-import {EyeSlashFilledIcon} from "../../components/EyeSlashFilledIcon";
+import {EyeFilledIcon} from "../../components/home/EyeFilledIcon";
+import {EyeSlashFilledIcon} from "../../components/home/EyeSlashFilledIcon";
 import {Button} from "@nextui-org/react";
 
 

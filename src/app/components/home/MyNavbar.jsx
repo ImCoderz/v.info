@@ -5,7 +5,6 @@ import {Link, Button} from "@nextui-org/react";
 import {ChevronDown, Lock, Activity, Flash, Server, TagUser, Scale} from "./Icons.jsx";
 import {signOut } from "next-auth/react"
 import {useSession} from "next-auth/react"
-
 import {AcmeLogo} from "./AcmeLogo.jsx";
 
 
@@ -95,13 +94,15 @@ export default function MyNavbar() {
                 >
                     {
                         itemsComponents[item]?.map((detail,index)=>(
-                            <DropdownItem
-                            key={`${detail}-${index}`}
-                            description="ACME scales apps to meet user demand, automagically, based on load."
-                            startContent={icons.scale}
-                          >
-                             {detail}
-                            </DropdownItem>
+                              <DropdownItem
+                              key={`${detail}-${index}`}
+                              description="Just a Description"
+                              startContent={icons.scale}
+                            >
+                                <Link href="/fournisseur">
+                                  {detail}
+                                </Link>
+                              </DropdownItem>
                         ))
                     }
                    
@@ -132,14 +133,12 @@ export default function MyNavbar() {
           <DropdownMenu aria-label="Profile Actions" variant="flat">
             <DropdownItem key="profile" className="h-14 gap-2">
               <p className="font-semibold">Signed in as</p>
-              <p className="font-semibold">zoey@example.com</p>
+              <p className="font-semibold">test@example.com</p>
             </DropdownItem>
             <DropdownItem key="settings">My Settings</DropdownItem>
-            <DropdownItem key="team_settings">Team Settings</DropdownItem>
-            <DropdownItem key="analytics">Analytics</DropdownItem>
-            <DropdownItem key="system">System</DropdownItem>
-            <DropdownItem key="configurations">Configurations</DropdownItem>
-            <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
+           
+            <DropdownItem key="configurations">Test</DropdownItem>
+            <DropdownItem key="help_and_feedback">Test</DropdownItem>
             <DropdownItem key="logout" color="danger" onClick={()=>signOut()} >
               Log Out
             </DropdownItem>
