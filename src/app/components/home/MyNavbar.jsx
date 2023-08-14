@@ -44,11 +44,12 @@ export default function MyNavbar() {
   }
 
   return (
+    <>
     <Navbar
       isBordered
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
-      className={`${!session&&("hidden")}`}
+      // className={`${!session&&("hidden")}`}
     >
       <NavbarContent className="sm:hidden" justify="start">
         <NavbarMenuToggle aria-label={isMenuOpen ? "Close menu" : "Open menu"} />
@@ -94,15 +95,15 @@ export default function MyNavbar() {
                 >
                     {
                         itemsComponents[item]?.map((detail,index)=>(
-                              <DropdownItem
+                          <DropdownItem
                               key={`${detail}-${index}`}
                               description="Just a Description"
                               startContent={icons.scale}
                             >
-                                <Link href="/fournisseur">
+                            <Link href={`/${detail.toLowerCase()}`}>
                                   {detail}
-                                </Link>
-                              </DropdownItem>
+                            </Link>
+                            </DropdownItem>
                         ))
                     }
                    
@@ -207,5 +208,6 @@ export default function MyNavbar() {
         }
       </NavbarMenu>
     </Navbar>
-  );
+  </>
+  )
 }

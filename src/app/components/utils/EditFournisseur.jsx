@@ -1,17 +1,41 @@
 "use client"
 
-import React, { useRef } from 'react'
+import React, { useRef,useEffect } from 'react'
 import {Tabs, Tab, Link, Button, Card, CardBody, CardHeader} from "@nextui-org/react";
 import {Dropdown, DropdownTrigger, DropdownMenu, DropdownItem} from "@nextui-org/react";
 import {Checkbox} from "@nextui-org/react";
 import {RadioGroup, Radio} from "@nextui-org/react";
-import axios from 'axios';
-
-
+import { ToastContainer, toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css"
 import {Input} from "@nextui-org/react";
-import { isIdentifier } from 'typescript';
+import axios from "../../../axios"
 
-const EditFournisseur = ({fournisseur,disabled}) => {
+const EditFournisseur = ({fournisseur,disabled,title}) => {
+  useEffect(()=>{
+    const getModepaie=async()=>{
+      const res1 =await axios.get(`/utils/modepaiement`)
+      const res3 =await axios.get(`/utils/devise`)
+      setModepaie(res1.data);
+      setDevise(res3.data);
+    }
+    getModepaie()
+  },[])
+  function getKeyByValue(jsonObject, targetValue,set) {
+    for (const key in jsonObject) {
+        if (jsonObject.hasOwnProperty(key) && jsonObject[key] === targetValue) {
+            set(key)
+        }
+    }
+    return null;
+}
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [valued, setValued] = React.useState();
+  const [modepaie, setModepaie] = React.useState();
+  const [devise, setDevise] = React.useState();
+
+
+
+
   const [isSelected1, setIsSelected1] = React.useState(fournisseur?.livrsansbc =="1");
   const [isSelected2, setIsSelected2] = React.useState(fournisseur?.fournissiege);
    
@@ -35,112 +59,145 @@ const EditFournisseur = ({fournisseur,disabled}) => {
   const [delaislivraison, setDelaislivraison] = React.useState(fournisseur?.delaisliv);
 
   
-    const ReferenceRef=useRef("fournisseur?.CODE_FRS")
-    const ComptableRef=useRef()
-    const NameRef=useRef()
-    const npatenteRef=useRef()
-    const IdentificationRef=useRef()
-    const adresseRef=useRef()
-    const postalRef=useRef()
-    const paysRef=useRef()
-    const villeRef=useRef()
-    const telephoneRef=useRef()
-    const faxRef=useRef()
-    const objectifRef=useRef()
-    const siteWebRef=useRef()
-    const emailRef=useRef()
-    const RfaRef=useRef()
-    const paimentRef=useRef()
-    const livraisonRef=useRef()
 
-
-    const [selectedKeysDevise, setSelectedKeysDevise] = React.useState(new Set(["text"]));
+    const [selectedKeysDevise, setSelectedKeysDevise] = React.useState(new Set([fournisseur?.REF_DEVISE||"text"]));
     const selectedValueDevise = React.useMemo(
       () => Array.from(selectedKeysDevise).join(", ").replaceAll("_", " "),
       [selectedKeysDevise]
     );
 
-    const [selectedKeysPaiement, setSelectedKeysPaiement] = React.useState(new Set(["text"]));
+    const [selectedKeysPaiement, setSelectedKeysPaiement] = React.useState(new Set([fournisseur?.REF_MODEPAIE||"text"]));
     const selectedValuePaiement = React.useMemo(
       () => Array.from(selectedKeysPaiement).join(", ").replaceAll("_", " "),
       [selectedKeysPaiement]
     );
     const save = async() =>{
+      setIsLoading(true)
       const payload={
         reference:reference,
-        comptable:comptable,
+        comptable:comptable||null,
         name:name,
-        npatente:patente,
-        identification:identif,
-        adresse:adresse,
-        postale:postale,
-        pays:pays,
-        ville:ville,
-        telephone:tele,
-        fax:fax,
-        modepaiement:10,
-        devise:20,
-        // modepaiement:selectedValuePaiement,
-        // devise:selectedValueDevise,
-        // objectif:objectifRef.current.value,
-        objectif:objectif,
-        siteWeb:site,
-        email:email,
-        rfa:rfa,
-        livrsansbc:isSelected1,
-        fournissiege:isSelected2,
-        partir:apartirde,
-        paiment:delaispaiement,
-        livration:delaislivraison
+        npatente:patente||null,
+        identification:identif||null,
+        adresse:adresse||null,
+        postale:postale||null,
+        pays:pays||null,
+        ville:ville||null,
+        telephone:tele||null,
+        fax:fax||null,
+        modepaiement:+selectedValuePaiement.split(" ")[0]||null,
+        devise:selectedValueDevise.split(" ")[0]||null,
+        objectif:+objectif||null,
+        siteWeb:site||null,
+        email:email||null,
+        rfa:rfa||null,
+        livrsansbc:isSelected1||false,
+        fournissiege:isSelected2||false,
+        partir:apartirde||null,
+        paiment:delaispaiement||null,
+        livration:delaislivraison||null
       }
-      console.log(payload);
-      const res =await axios.put(`http://localhost:8000/fournisseurs/edit/${fournisseur.CODE_FRS}`,payload)
-      console.log(res);
+      if(fournisseur){
+        try{
+          const res =await axios.put(`/fournisseurs/edit/${fournisseur.CODE_FRS}`,payload)
+          toast.success(res.data?.message, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            })
+        }catch(error){
+          console.log(error);
+          // toast.error(error.response.data.error, {
+          //   position: "top-right",
+          //   autoClose: 5000,
+          //   hideProgressBar: false,
+          //   closeOnClick: true,
+          //   pauseOnHover: true,
+          //   draggable: true,
+          //   progress: undefined,
+          //   theme: "light",
+          //   })
+        }
+        
+      }else{
+        try {
+          const res =await axios.post(`/fournisseurs/add/`,payload)
+          toast.success(res.data?.message, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            })
+        } catch (error) {
+          console.log(error);
+          // toast.error(error.response.data.error, {
+          //   position: "top-right",
+          //   autoClose: 5000,
+          //   hideProgressBar: false,
+          //   closeOnClick: true,
+          //   pauseOnHover: true,
+          //   draggable: true,
+          //   progress: undefined,
+          //   theme: "light",
+          //   })
+        }
+      }
+      setIsLoading(false)
     }
   return (
     <div className="flex w-full justify-center items-center">
+        <ToastContainer/>
         <div className="flex flex-col w-full items-center">
-      <Card className="max-w-full w-[90%] h-fit">
+      <Card className="max-w-full w-full h-fit">
         <CardBody className="overflow-hidden">
-              <h2 className='text-center font-semibold text-xl pb-12'>Edit Fournisseur</h2>
+              <h2 className='text-center font-semibold text-xl pb-12'>{title} Fournisseur</h2>
 
-              <form className="flex flex-col gap-4">
+              <form className="flex flex-col gap-4" onSubmit={save}>
               <h2 className=' font-medium text-sm'>Identification</h2>
 
                 <div className="flex flex-col gap-4 h-fit border p-2 py-5 border-slate-400 rounded-xl">
                   <div className="flex justify-between gap-6">
-                      <Input isDisabled={disabled}  isRequired label="Reference" placeholder="Enter your reference" value={reference} onValueChange={setReference} type="text"  ref={ReferenceRef}/>
-                      <Input isDisabled={disabled}  isRequired label="Compte comptable" placeholder="Enter your Compte comptable" value={comptable} onValueChange={setComptable} type="text" ref={ComptableRef} />
+                      <Input isDisabled={disabled}  isRequired label="Reference" placeholder="Enter your reference" value={reference} onValueChange={setReference} type="number"   />
+                      <Input isDisabled={disabled}   label="Compte comptable" placeholder="Enter your Compte comptable" value={comptable} onValueChange={setComptable} type="text"  />
                   </div>
                   <div className="flex justify-between gap-6">
-                      <Input isDisabled={disabled}  isRequired label="Fournisseur" placeholder="Enter your name" value={name} onValueChange={setName} type="text" ref={NameRef}/>
-                      <Input isDisabled={disabled}   isRequired label="N patente" placeholder="Enter your n patente" value={patente} onValueChange={setPatente} type="number" ref={npatenteRef} />
+                      <Input isDisabled={disabled}  isRequired label="Fournisseur" placeholder="Enter your name" value={name} onValueChange={setName} type="text" />
+                      <Input isDisabled={disabled}    label="N patente" placeholder="Enter your n patente" value={patente} onValueChange={setPatente} type="number"  />
                   </div>
-                  <Input isDisabled={disabled}  isRequired label="Identification fiscal" value={identif} onValueChange={setIdentif} placeholder="Enter your Identification fiscal" type="text" ref={IdentificationRef}/>
+                  <Input isDisabled={disabled}   label="Identification fiscal" value={identif} onValueChange={setIdentif} placeholder="Enter your Identification fiscal" type="text" />
                 
                 </div>
                 <h2 className=' font-medium text-sm '>Adresse</h2>
 
               <div className="flex flex-col gap-4 h-fit border p-2 py-5 border-slate-400 rounded-xl">
-                <Input isDisabled={disabled}  isRequired label="Adresse"  value={adresse} onValueChange={setAdresse} placeholder="Enter your Adresse" type="text" ref={adresseRef} />
+                <Input isDisabled={disabled}   label="Adresse"  value={adresse} onValueChange={setAdresse} placeholder="Enter your Adresse" type="text"  />
                 <div className="flex justify-between gap-6">
-                    <Input isDisabled={disabled}  isRequired label="Code postal" value={postale} onValueChange={setPostale} placeholder="Enter your Code postal" type="text" ref={postalRef} />
-                    <Input isDisabled={disabled}  isRequired label="Pays" value={pays} onValueChange={setPays} placeholder="Enter your pays" type="text" ref={paysRef} />
+                    <Input isDisabled={disabled}   label="Code postal" value={postale} onValueChange={setPostale} placeholder="Enter your Code postal" type="text" />
+                    <Input isDisabled={disabled}   label="Pays" value={pays} onValueChange={setPays} placeholder="Enter your pays" type="text"  />
                 </div>
                 <div className="flex justify-between gap-6">
-                    <Input isDisabled={disabled}   isRequired label="Ville" value={ville} onValueChange={setVille} placeholder="Enter your Ville" type="number" ref={villeRef}/>
+                    <Input isDisabled={disabled}    label="Ville" value={ville} onValueChange={setVille} placeholder="Enter your Ville" type="text" />
                 </div>
               </div>
               <h2 className=' font-medium text-sm '>Coordonnees</h2>
 
               <div className="flex flex-col gap-4 h-fit border p-2 py-5 border-slate-400 rounded-xl">
                 <div className="flex justify-between gap-6">
-                    <Input isDisabled={disabled} dis isRequired label="Telephone" value={tele} onValueChange={setTele} placeholder="Enter your Telephone" type="text" ref={telephoneRef} />
-                    <Input isDisabled={disabled}  isRequired label="Fax" value={fax} onValueChange={setFax} placeholder="Enter your Fax" type="text" ref={faxRef} />
+                    <Input isDisabled={disabled} dis  label="Telephone" value={tele} onValueChange={setTele} placeholder="Enter your Telephone" type="text"  />
+                    <Input isDisabled={disabled}   label="Fax" value={fax} onValueChange={setFax} placeholder="Enter your Fax" type="text" />
                 </div>
                 <div className="flex justify-between gap-6">
-                    <Input isDisabled={disabled}  isRequired label="Site web" value={site} onValueChange={setSite} placeholder="Enter your Site web" type="text" ref={siteWebRef} />
-                    <Input isDisabled={disabled}   isRequired label="Email" value={email} onValueChange={setEmail} placeholder="Enter your Email" type="email" ref={emailRef} />
+                    <Input isDisabled={disabled}   label="Site web" value={site} onValueChange={setSite} placeholder="Enter your Site web" type="text"  />
+                    <Input isDisabled={disabled}    label="Email" value={email} onValueChange={setEmail} placeholder="Enter your Email" type="email"  />
                 </div>
 
                 
@@ -172,11 +229,11 @@ const EditFournisseur = ({fournisseur,disabled}) => {
                               onSelectionChange={setSelectedKeysPaiement}
                               aria-disabled={disabled}
                           >
-                              <DropdownItem key="text">Text</DropdownItem>
-                              <DropdownItem key="number">Number</DropdownItem>
-                              <DropdownItem key="date">Date</DropdownItem>
-                              <DropdownItem key="single_date">Single Date</DropdownItem>
-                              <DropdownItem key="iteration">Iteration</DropdownItem>
+                            {
+                              modepaie?.map((mode)=>(
+                                <DropdownItem key={`${mode.REF_MODEPAIE}_${mode.MODEPAIE}`}>{`${mode.REF_MODEPAIE}_${mode.MODEPAIE}`}</DropdownItem>
+                              ))
+                            }
                           </DropdownMenu>
                         </Dropdown>
                       </div>
@@ -204,18 +261,18 @@ const EditFournisseur = ({fournisseur,disabled}) => {
                             onSelectionChange={setSelectedKeysDevise}
                             aria-disabled={disabled}
                         >
-                            <DropdownItem key="text">Text</DropdownItem>
-                            <DropdownItem key="number">Number</DropdownItem>
-                            <DropdownItem key="date">Date</DropdownItem>
-                            <DropdownItem key="single_date">Single Date</DropdownItem>
-                            <DropdownItem key="iteration">Iteration</DropdownItem>
+                            {
+                              devise?.map((dev)=>(
+                                <DropdownItem key={`${dev.REF_DEVISE}_${dev.DEVISE}`}>{`${dev.REF_DEVISE}_${dev.DEVISE}`}</DropdownItem>
+                              ))
+                            }
                         </DropdownMenu>
                       </Dropdown>
                     </div>
                     </div>
                     <div className="flex justify-between gap-6">
-                      <Input isDisabled={disabled}  isRequired label="Objectif" value={objectif} onValueChange={setObjectif} placeholder="Enter your Objectif" type="number" ref={objectifRef}/>
-                      <Input isDisabled={disabled}   isRequired label="RFA" value={rfa} onValueChange={setRfa} placeholder="Enter your RFA" type="number" ref={RfaRef} />
+                      <Input isDisabled={disabled}   label="Objectif" value={objectif} onValueChange={setObjectif} placeholder="Enter your Objectif" type="number" />
+                      <Input isDisabled={disabled}    label="RFA" value={rfa} onValueChange={setRfa} placeholder="Enter your RFA" type="number"  />
                     </div>
                     <div className="flex justify-between gap-6">
                       <Checkbox isDisabled={disabled} isSelected={isSelected1} onValueChange={setIsSelected1} >Peut livrer sans bon de commande</Checkbox>
@@ -234,8 +291,8 @@ const EditFournisseur = ({fournisseur,disabled}) => {
                       <Radio value="buenos-aires">Date Facture</Radio>
                       <Radio value="sydney">Fin de mois</Radio>
                     </RadioGroup>
-                    <Input isDisabled={disabled}   isRequired label="Delais de Paiement" value={delaispaiement} onValueChange={setDelaispaiement} placeholder="Delais de paiement" type="number" ref={paimentRef} />
-                    <Input isDisabled={disabled}   isRequired label="Delais de livraison" value={delaislivraison} onValueChange={setDelaislivraison} placeholder="Delais de livraison" type="number" ref={livraisonRef} />
+                    <Input isDisabled={disabled}    label="Delais de Paiement" value={delaispaiement} onValueChange={setDelaispaiement} placeholder="Delais de paiement" type="number"  />
+                    <Input isDisabled={disabled}    label="Delais de livraison" value={delaislivraison} onValueChange={setDelaislivraison} placeholder="Delais de livraison" type="number"  />
                   </div>
                 </div>
               
@@ -244,7 +301,7 @@ const EditFournisseur = ({fournisseur,disabled}) => {
                 {
                   !disabled&&(
                     <>
-                    <Button size="md" color='primary' className='px-16  py-2 ' onClick={save}>
+                    <Button isLoading={isLoading} size="md" type='submit' color='primary' className='px-16  py-2 '>
                       Save
                     </Button>
                     <Button size="md"  className='px-16   py-2 '>

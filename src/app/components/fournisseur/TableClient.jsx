@@ -4,7 +4,10 @@ import {EditIcon} from "./EditIcon";
 import {DeleteIcon} from "./DeleteIcon";
 import {EyeIcon} from "./EyeIcon";
 import Link from "next/link"
-import axios from  "axios"
+import axios from "../../../axios"
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import {
   Table,
@@ -23,6 +26,7 @@ import {
   Chip,
   User,
   Pagination,
+  Spinner,
 } from "@nextui-org/react";
 import {PlusIcon} from "./PlusIcon";
 import {VerticalDotsIcon} from "./VerticalDotsIcon";
@@ -41,23 +45,44 @@ const INITIAL_VISIBLE_COLUMNS = ["CLIENT","VILLELIV","VILLEFACT", "PAYS","action
 
 export default function TableFournisseur() {
 
-  const deleteFournisseur=async(id)=>{
-    await axios.delete(`http://localhost:8000/client/delete/${id}`).then((res)=>{
-      console.log("res.dat");
+  const deleteClient=async(id)=>{
+    await axios.delete(`/client/delete/${id}`).then((res)=>{
+      console.log(res);
+      toast.success(res.data?.message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        })
       setChanged(true)
     })
     .catch((err)=>{
-      console.log(err);
+      toast.error(res.data?.message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        })
     })
   }
   const [users, setUsers] = React.useState([]);
   const [changed, setChanged] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   useEffect(()=>{
     const getClients=async()=>{
-      const res =await axios.get("http://localhost:8000/client/")
-      console.log(res.data?.clients);
-      setUsers(res.data?.clients)
+      const res =await axios.get("/client/")
+      console.log(res.data);
+      setUsers(res.data)
+      setIsLoading(false)
     }
     getClients()
     setChanged(false)
@@ -90,7 +115,7 @@ export default function TableFournisseur() {
 
     if (hasSearchFilter) {
       filteredUsers = filteredUsers.filter((user) =>
-        user.FOURNISSEUR.toLowerCase().includes(filterValue.toLowerCase()),
+        user.CLIENT.toLowerCase().includes(filterValue.toLowerCase()),
       );
     }
     if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
@@ -179,15 +204,15 @@ export default function TableFournisseur() {
                 </span>
               </Link>
             </Tooltip>
-            <Tooltip content="Edit user">
+            <Tooltip content="Edit client">
               <Link href={`/client/edit/${user.CODE_CLT}`}>
                 <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                   <EditIcon />
                 </span>
               </Link>
             </Tooltip>
-            <Tooltip color="danger" content="Delete user" >
-              <span className="text-lg text-danger cursor-pointer active:opacity-50" onClick={()=>deleteFournisseur(user?.CODE_FRS)}>
+            <Tooltip color="danger" content="Delete client" >
+              <span className="text-lg text-danger cursor-pointer active:opacity-50" onClick={()=>deleteClient(user?.CODE_CLT)}>
                 <DeleteIcon />
               </span>
             </Tooltip>
@@ -239,7 +264,7 @@ export default function TableFournisseur() {
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
-            <Dropdown>
+            {/* <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
                   Status
@@ -259,7 +284,7 @@ export default function TableFournisseur() {
                   </DropdownItem>
                 ))}
               </DropdownMenu>
-            </Dropdown>
+            </Dropdown> */}
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
@@ -271,6 +296,7 @@ export default function TableFournisseur() {
                 aria-label="Table Columns"
                 closeOnSelect={false}
                 selectedKeys={visibleColumns}
+                className="h-[400px] overflow-y-scroll"
                 selectionMode="multiple"
                 onSelectionChange={setVisibleColumns}
               >
@@ -289,7 +315,7 @@ export default function TableFournisseur() {
           </div>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-default-400 text-small">Total {users.length} users</span>
+          <span className="text-default-400 text-small">Total {users.length} clients</span>
           <label className="flex items-center text-default-400 text-small">
             Rows per page:
             <select
@@ -345,6 +371,8 @@ export default function TableFournisseur() {
   }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
   return (
+    <>
+    <ToastContainer />
     <Table
       aria-label="Example table with custom cells, pagination and sorting"
       isHeaderSticky
@@ -372,7 +400,7 @@ export default function TableFournisseur() {
           </TableColumn>
         )}
       </TableHeader>
-      <TableBody emptyContent={"No users found"} items={sortedItems}>
+      <TableBody isLoading={isLoading} emptyContent={isLoading?<Spinner size="lg" />:"No clients found"} items={sortedItems}>
         {(item) => (
           <TableRow key={item?.CODE_CLT}>
             {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
@@ -380,5 +408,6 @@ export default function TableFournisseur() {
         )}
       </TableBody>
     </Table>
+    </>
   );
 }

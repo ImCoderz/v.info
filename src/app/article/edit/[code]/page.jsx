@@ -1,23 +1,23 @@
 import React from 'react'
-import FormClient from '@/app/components/client/FormClient';
+import FormArticle from '@/app/components/article/FormArticle';
 import axios from "../../../../axios"
 
-const getClient=async(id)=>{
+const getArticle=async(id)=>{
     console.log(id+"mmmmmm");
-    const res =await axios.get(`/client/${id}`)
+    const res =await axios.get(`/article/${id}`)
     return res?.data
 }
 
 const page = async({params:{code}}) => {
   
-  const clientData=getClient(code)
-  const clienta=await clientData
-  const client=clienta[0]
+  const articleData=getaAticle(code)
+  const articlea=await articleData
+  const article=articlea[0]
 
   return (
     <div className=" mt-10 justify-center items-center flex flex-col gap-6">
       <div className='md:w-[72%] w-[95%]'>
-        <FormClient client={client} />
+        <FormArticle article={article} />
       </div>
     </div>
   )

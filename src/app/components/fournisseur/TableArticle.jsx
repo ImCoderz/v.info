@@ -3,7 +3,11 @@ import React,{useEffect} from "react";
 import {EditIcon} from "./EditIcon";
 import {DeleteIcon} from "./DeleteIcon";
 import {EyeIcon} from "./EyeIcon";
-import axios from  "axios"
+import Link from "next/link"
+import axios from "../../../axios"
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import {
   Table,
@@ -13,6 +17,7 @@ import {
   TableRow,
   TableCell,
   Input,
+  Spinner,
   Tooltip,
   Button,
   DropdownTrigger,
@@ -27,7 +32,7 @@ import {PlusIcon} from "./PlusIcon";
 import {VerticalDotsIcon} from "./VerticalDotsIcon";
 import {SearchIcon} from "./SearchIcon";
 import {ChevronDownIcon} from "./ChevronDownIcon";
-import {statusOptions} from "./dataFournisseur";
+import {columns,statusOptions} from "./dataArticle";
 import {capitalize} from "./utils";
 
 const statusColorMap = {
@@ -36,24 +41,58 @@ const statusColorMap = {
   vacation: "warning",
 };
 
-const INITIAL_VISIBLE_COLUMNS = ["FOURNISSEUR","VILLE", "PAYS","actions"];
+const INITIAL_VISIBLE_COLUMNS = ["ARTICLE","LIBCAISSE","DATECREAT", "DATEMODIF","actions"];
 
 export default function TableFournisseur() {
+
+  const deleteArticle=async(id)=>{
+    await axios.delete(`/article/delete/${id}`).then((res)=>{
+      console.log(res);
+      toast.success(res.data?.message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        })
+      setChanged(true)
+    })
+    .catch((err)=>{
+      toast.error(res.data?.message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        })
+    })
+  }
   const [users, setUsers] = React.useState([]);
-  const [colums, setcolums] = React.useState([]);
+  const [changed, setChanged] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
+
   useEffect(()=>{
-    const getFournisseurs=async()=>{
-      const res =await axios.get("http://localhost:8000/fournisseurs/")
-      console.log(res.data?.fournisseurs);
-      setUsers(res.data?.fournisseurs)
+    const getArticles=async()=>{
+      const res =await axios.get("/article/")
+      console.log(res.data);
+      setUsers(res.data)
     }
-   getFournisseurs()
-  })
+    getArticles()
+    setChanged(false)
+  },[changed])
+
+
   const [filterValue, setFilterValue] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
   const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
   const [statusFilter, setStatusFilter] = React.useState("all");
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(4);
   const [sortDescriptor, setSortDescriptor] = React.useState({
     column: "age",
     direction: "ascending",
@@ -75,7 +114,7 @@ export default function TableFournisseur() {
 
     if (hasSearchFilter) {
       filteredUsers = filteredUsers.filter((user) =>
-        user.FOURNISSEUR.toLowerCase().includes(filterValue.toLowerCase()),
+        user.ARTICLE.toLowerCase().includes(filterValue.toLowerCase()),
       );
     }
     if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
@@ -106,37 +145,52 @@ export default function TableFournisseur() {
 
   const renderCell = React.useCallback((user, columnKey) => {
     const cellValue = user[columnKey];
-    console.log(cellValue)
+    console.log(cellValue);
+
     switch (columnKey) {
-      case "FOURNISSEUR":
+      case "ARTICLE":
         return (
           <User
             avatarProps={{radius: "lg", src: "https://i.pravatar.cc/150?u=a042581f4e29026704d"}}
-            description={user.E_MAIL}
+            description={user.DATECREAT}
             name={cellValue}
           >
-            {user.E_MAIL}
+            {user.DATECREAT}
           </User>
         );
-      case "VILLE":
+      case "LIBCAISSE":
         return (
           <div className="flex flex-col">
             <p className="text-bold text-small capitalize">{cellValue}</p>
-            <p className="text-bold text-tiny capitalize text-default-400">{user.VILLE}</p>
+            <p className="text-bold text-tiny capitalize text-default-400">{user.LIBCAISSE}</p>
           </div>
         );
-      case "CODE_FRS":
+      // case "DATECREAT":
+      //   return (
+      //     <div className="flex flex-col">
+      //       <p className="text-bold text-small capitalize">{cellValue}</p>
+      //       <p className="text-bold text-tiny capitalize text-default-400">{user.DATECREAT}</p>
+      //     </div>
+      //   );
+      // case "DATEMODIF":
+      //   return (
+      //     <div className="flex flex-col">
+      //       <p className="text-bold text-small capitalize">{cellValue}</p>
+      //       <p className="text-bold text-tiny capitalize text-default-400">{user.DATEMODIF}</p>
+      //     </div>
+      //   );
+      case "REF_ART":
         return (
           <div className="flex flex-col">
             <p className="text-bold text-small capitalize">{cellValue}</p>
-            <p className="text-bold text-tiny capitalize text-default-400">{user.CODE_FRS}</p>
+            <p className="text-bold text-tiny capitalize text-default-400">{user.REF_ART}</p>
           </div>
         );
-      case "PAYS":
+      case "TYPEART":
         return (
           <div className="flex flex-col">
             <p className="text-bold text-small capitalize">{cellValue}</p>
-            <p className="text-bold text-tiny capitalize text-default-400">{user.PAYS}</p>
+            <p className="text-bold text-tiny capitalize text-default-400">{user.REF_ART}</p>
           </div>
         );
       case "status":
@@ -150,17 +204,21 @@ export default function TableFournisseur() {
           <div className="relative flex justify-end items-center gap-2">
             <div className="relative flex items-center gap-2">
             <Tooltip content="Details">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <EyeIcon />
-              </span>
+              <Link href={`/article/details/${user.REF_ART}`}>
+                <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                  <EyeIcon />
+                </span>
+              </Link>
             </Tooltip>
-            <Tooltip content="Edit user">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <EditIcon />
-              </span>
+            <Tooltip content="Edit article">
+              <Link href={`/article/edit/${user.REF_ART}`}>
+                <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                  <EditIcon />
+                </span>
+              </Link>
             </Tooltip>
-            <Tooltip color="danger" content="Delete user">
-              <span className="text-lg text-danger cursor-pointer active:opacity-50">
+            <Tooltip color="danger" content="Delete article" >
+              <span className="text-lg text-danger cursor-pointer active:opacity-50" onClick={()=>deleteArticle(user?.REF_ART)}>
                 <DeleteIcon />
               </span>
             </Tooltip>
@@ -212,7 +270,7 @@ export default function TableFournisseur() {
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
-            <Dropdown>
+            {/* <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
                   Status
@@ -232,7 +290,7 @@ export default function TableFournisseur() {
                   </DropdownItem>
                 ))}
               </DropdownMenu>
-            </Dropdown>
+            </Dropdown> */}
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
@@ -243,6 +301,7 @@ export default function TableFournisseur() {
                 disallowEmptySelection
                 aria-label="Table Columns"
                 closeOnSelect={false}
+                className="h-[400px] overflow-y-scroll"
                 selectedKeys={visibleColumns}
                 selectionMode="multiple"
                 onSelectionChange={setVisibleColumns}
@@ -254,13 +313,15 @@ export default function TableFournisseur() {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Button color="primary" endContent={<PlusIcon />}>
-              Add New
-            </Button>
+            <Link href="/article/add">
+              <Button color="primary" endContent={<PlusIcon />}>
+                Add New
+              </Button>
+            </Link>
           </div>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-default-400 text-small">Total {users.length} users</span>
+          <span className="text-default-400 text-small">Total {users.length} articles</span>
           <label className="flex items-center text-default-400 text-small">
             Rows per page:
             <select
@@ -316,6 +377,8 @@ export default function TableFournisseur() {
   }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
   return (
+    <>
+    <ToastContainer />
     <Table
       aria-label="Example table with custom cells, pagination and sorting"
       isHeaderSticky
@@ -343,13 +406,14 @@ export default function TableFournisseur() {
           </TableColumn>
         )}
       </TableHeader>
-      <TableBody emptyContent={"No users found"} items={sortedItems}>
+      <TableBody isLoading={isLoading} emptyContent={isLoading?<Spinner size="lg" />:"No articles found"} items={sortedItems}>
         {(item) => (
-          <TableRow key={item?.CODE_FRS}>
+          <TableRow key={item?.REF_ART}>
             {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
           </TableRow>
         )}
       </TableBody>
     </Table>
+    </>
   );
 }

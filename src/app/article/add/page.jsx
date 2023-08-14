@@ -1,11 +1,12 @@
 import React from 'react'
-import Wrapper from '@/app/components/utils/Wrapper';
+import FormArticle from '@/app/components/article/FormArticle';
+
 const page = () => {
     
   return (
     <div className=" mt-10 justify-center items-center flex flex-col gap-6">
-      <div className='w-[72%]'>
-        <Wrapper/>
+      <div className='md:w-[72%] w-[95%]'>
+        <FormArticle/>
       </div>
     </div>
   )

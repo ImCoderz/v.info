@@ -1,23 +1,23 @@
 import React from 'react'
-import EditFournisseur from '@/app/components/utils/EditFournisseur';
-import axios from "axios"
+import FormClient from '@/app/components/client/FormClient';
+import axios from "../../../../axios"
 
-const getFournisseur=async(id)=>{
+const getClient=async(id)=>{
     console.log(id+"mmmmmm");
-    const res =await axios.get(`http://localhost:8000/fournisseurs/${id}`)
-    return res?.data.fournisseur
+    const res =await axios.get(`/client/${id}`)
+    return res?.data
 }
 
 const page = async({params:{code}}) => {
   
-  const fournisseurData=getFournisseur(code)
-  const fournisseura=await fournisseurData
-  const fournisseur=fournisseura[0]
+  const clientData=getClient(code)
+  const clienta=await clientData
+  const client=clienta[0]
 
   return (
     <div className=" mt-10 justify-center items-center flex flex-col gap-6">
-      <div className='w-[72%]'>
-        <EditFournisseur fournisseur={fournisseur} disabled={true}/>
+      <div className='md:w-[72%] w-[95%]'>
+        <FormClient client={client} disabled={true}/>
       </div>
     </div>
   )

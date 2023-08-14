@@ -7,7 +7,7 @@ const page = () => {
  
   return (
     <div className=" mt-10 justify-center items-center flex">
-      <div className='w-[72%]'>
+      <div className='md:w-[72%] w-[90%]'>
        <TableFournisseur/>
        {/* <Table/> */}
       </div>
