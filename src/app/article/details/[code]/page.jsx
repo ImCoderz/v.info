@@ -10,7 +10,7 @@ const getArticle=async(id)=>{
 
 const page = async({params:{code}}) => {
   
-  const articleData=getaAticle(code)
+  const articleData=getArticle(code)
   const articlea=await articleData
   const article=articlea[0]
 

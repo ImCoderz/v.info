@@ -44,7 +44,7 @@ export default function MyNavbar() {
   }
 
   return (
-    <>
+    <nav>
     <Navbar
       isBordered
       isMenuOpen={isMenuOpen}
@@ -208,6 +208,6 @@ export default function MyNavbar() {
         }
       </NavbarMenu>
     </Navbar>
-  </>
+  </nav>
   )
 }

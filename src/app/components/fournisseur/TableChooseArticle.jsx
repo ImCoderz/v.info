@@ -41,9 +41,9 @@ const statusColorMap = {
   vacation: "warning",
 };
 
-const INITIAL_VISIBLE_COLUMNS = ["ARTICLE","LIBCAISSE","DATECREAT", "DATEMODIF","actions"];
+const INITIAL_VISIBLE_COLUMNS = ["REF_ART","ARTICLE","STOCKG", "MODELE","TAILLE","COULEUR","PA_HT","PA_TTC","PV_HT","PV_TTC","actions"];
 
-export default function TableFournisseur() {
+export default function TableChooseArticle({choosen,setChoosen}) {
 
   const deleteArticle=async(id)=>{
     await axios.delete(`/article/delete/${id}`).then((res)=>{
@@ -79,7 +79,7 @@ export default function TableFournisseur() {
 
   useEffect(()=>{
     const getArticles=async()=>{
-      const res =await axios.get("/article/")
+      const res =await axios.get("/commande/tablearticle")
       console.log(res.data);
       setUsers(res.data)
       setIsLoading(false)
@@ -87,6 +87,15 @@ export default function TableFournisseur() {
     getArticles()
     setChanged(false)
   },[changed])
+
+  const choose =()=>{
+      const choosenUsers = users.filter((user) =>
+        Array.from(selectedKeys).includes(user.REF_ART)
+      );
+      setChoosen(choosenUsers)
+      console.log(selectedKeys);
+      console.log(choosen);
+  }
 
 
   const [filterValue, setFilterValue] = React.useState("");
@@ -159,13 +168,13 @@ export default function TableFournisseur() {
             {user.DATECREAT}
           </User>
         );
-      case "LIBCAISSE":
-        return (
-          <div className="flex flex-col">
-            <p className="text-bold text-small capitalize">{cellValue}</p>
-            <p className="text-bold text-tiny capitalize text-default-400">{user.LIBCAISSE}</p>
-          </div>
-        );
+      // case "LIBCAISSE":
+      //   return (
+      //     <div className="flex flex-col">
+      //       <p className="text-bold text-small capitalize">{cellValue}</p>
+      //       <p className="text-bold text-tiny capitalize text-default-400">{user.LIBCAISSE}</p>
+      //     </div>
+      //   );
       // case "DATECREAT":
       //   return (
       //     <div className="flex flex-col">
@@ -181,13 +190,6 @@ export default function TableFournisseur() {
       //     </div>
       //   );
       case "REF_ART":
-        return (
-          <div className="flex flex-col">
-            <p className="text-bold text-small capitalize">{cellValue}</p>
-            <p className="text-bold text-tiny capitalize text-default-400">{user.REF_ART}</p>
-          </div>
-        );
-      case "TYPEART":
         return (
           <div className="flex flex-col">
             <p className="text-bold text-small capitalize">{cellValue}</p>
@@ -415,6 +417,7 @@ export default function TableFournisseur() {
         )}
       </TableBody>
     </Table>
+    <button onClick={choose}> hello</button>
     </>
   );
 }

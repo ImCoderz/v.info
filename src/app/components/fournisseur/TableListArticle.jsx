@@ -17,7 +17,6 @@ import {
   TableRow,
   TableCell,
   Input,
-  Spinner,
   Tooltip,
   Button,
   DropdownTrigger,
@@ -27,26 +26,27 @@ import {
   Chip,
   User,
   Pagination,
+  Spinner,
 } from "@nextui-org/react";
 import {PlusIcon} from "./PlusIcon";
 import {VerticalDotsIcon} from "./VerticalDotsIcon";
 import {SearchIcon} from "./SearchIcon";
 import {ChevronDownIcon} from "./ChevronDownIcon";
-import {columns,statusOptions} from "./dataArticle";
+import {columns} from "./dataCommande";
 import {capitalize} from "./utils";
 
-const statusColorMap = {
-  active: "success",
-  paused: "danger",
-  vacation: "warning",
-};
+// const statusColorMap = {
+//   active: "success",
+//   paused: "danger",
+//   vacation: "warning",
+// };
 
-const INITIAL_VISIBLE_COLUMNS = ["ARTICLE","LIBCAISSE","DATECREAT", "DATEMODIF","actions"];
+const INITIAL_VISIBLE_COLUMNS = ["REF_BC","ARTICLE","FOURNISSEUR", "DATE_BC","MNT_HT","MNT_TTC","actions"];
 
-export default function TableFournisseur() {
+export default function TableFournisseur({choosen,setChoosen}) {
 
-  const deleteArticle=async(id)=>{
-    await axios.delete(`/article/delete/${id}`).then((res)=>{
+  const deleteClient=async(id)=>{
+    await axios.delete(`/commande/delete/${id}`).then((res)=>{
       console.log(res);
       toast.success(res.data?.message, {
         position: "top-right",
@@ -73,27 +73,31 @@ export default function TableFournisseur() {
         })
     })
   }
-  const [users, setUsers] = React.useState([]);
+  const [statusOptions, setStatusOptions] = React.useState([]);
+  const [users, setUsers] = React.useState(choosen);
   const [changed, setChanged] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
 
   useEffect(()=>{
-    const getArticles=async()=>{
-      const res =await axios.get("/article/")
+    const getCommande=async()=>{
+      const res =await axios.get("/commande/table")
+      const res2 =await axios.get("/utils/entropot")
       console.log(res.data);
-      setUsers(res.data)
+      // setUsers(res.data)
+      setStatusOptions(res2.data)
       setIsLoading(false)
     }
-    getArticles()
+    getCommande()
     setChanged(false)
-  },[changed])
+    setUsers(choosen)
+  },[changed,choosen])
 
 
   const [filterValue, setFilterValue] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
   const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
   const [statusFilter, setStatusFilter] = React.useState("all");
-  const [rowsPerPage, setRowsPerPage] = React.useState(4);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [sortDescriptor, setSortDescriptor] = React.useState({
     column: "age",
     direction: "ascending",
@@ -115,12 +119,12 @@ export default function TableFournisseur() {
 
     if (hasSearchFilter) {
       filteredUsers = filteredUsers.filter((user) =>
-        user.ARTICLE.toLowerCase().includes(filterValue.toLowerCase()),
+        user.FOURNISSEUR.toLowerCase().includes(filterValue.toLowerCase()),
       );
     }
     if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
       filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(user.status),
+        Array.from(statusFilter).includes(user.ENTROPOT),
       );
     }
 
@@ -149,77 +153,59 @@ export default function TableFournisseur() {
     console.log(cellValue);
 
     switch (columnKey) {
-      case "ARTICLE":
+      case "FOURNISSEUR":
         return (
           <User
             avatarProps={{radius: "lg", src: "https://i.pravatar.cc/150?u=a042581f4e29026704d"}}
-            description={user.DATECREAT}
+            description={user.ARTICLE}
             name={cellValue}
           >
-            {user.DATECREAT}
+            {user.E_MAIL}
           </User>
         );
-      case "LIBCAISSE":
+      case "ENTROPOT":
+        return (
+          <User
+            avatarProps={{radius: "lg", src: "https://i.pravatar.cc/150?u=a042581f4e29026704d"}}
+            description={user.E_MAIL}
+            name={cellValue}
+          >
+            {user.E_MAIL}
+          </User>
+        );
+      case "REF_BC":
         return (
           <div className="flex flex-col">
             <p className="text-bold text-small capitalize">{cellValue}</p>
-            <p className="text-bold text-tiny capitalize text-default-400">{user.LIBCAISSE}</p>
+            <p className="text-bold text-tiny capitalize text-default-400">{user.REF_BC}</p>
           </div>
         );
-      // case "DATECREAT":
-      //   return (
-      //     <div className="flex flex-col">
-      //       <p className="text-bold text-small capitalize">{cellValue}</p>
-      //       <p className="text-bold text-tiny capitalize text-default-400">{user.DATECREAT}</p>
-      //     </div>
-      //   );
-      // case "DATEMODIF":
-      //   return (
-      //     <div className="flex flex-col">
-      //       <p className="text-bold text-small capitalize">{cellValue}</p>
-      //       <p className="text-bold text-tiny capitalize text-default-400">{user.DATEMODIF}</p>
-      //     </div>
-      //   );
-      case "REF_ART":
-        return (
-          <div className="flex flex-col">
-            <p className="text-bold text-small capitalize">{cellValue}</p>
-            <p className="text-bold text-tiny capitalize text-default-400">{user.REF_ART}</p>
-          </div>
-        );
-      case "TYPEART":
-        return (
-          <div className="flex flex-col">
-            <p className="text-bold text-small capitalize">{cellValue}</p>
-            <p className="text-bold text-tiny capitalize text-default-400">{user.REF_ART}</p>
-          </div>
-        );
-      case "status":
-        return (
-          <Chip className="capitalize" color={statusColorMap[user.status]} size="sm" variant="flat">
-            {cellValue}
-          </Chip>
-        );
+    //   case "status":
+    //     return (
+    //       <Chip className="capitalize" color={statusColorMap[user.status]} size="sm" variant="flat">
+    //         {cellValue}
+    //       </Chip>
+    //     );
       case "actions":
         return (
           <div className="relative flex justify-end items-center gap-2">
             <div className="relative flex items-center gap-2">
             <Tooltip content="Details">
-              <Link href={`/article/details/${user.REF_ART}`}>
+              <Link href={`/commande/details/${user.REF_BC}`}>
                 <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                   <EyeIcon />
                 </span>
               </Link>
             </Tooltip>
-            <Tooltip content="Edit article">
-              <Link href={`/article/edit/${user.REF_ART}`}>
+            <Tooltip content="Edit commande">
+              <Link href={`/commande/edit/${user.REF_BC}`}>
                 <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                   <EditIcon />
                 </span>
               </Link>
             </Tooltip>
-            <Tooltip color="danger" content="Delete article" >
-              <span className="text-lg text-danger cursor-pointer active:opacity-50" onClick={()=>deleteArticle(user?.REF_ART)}>
+            <Tooltip color="danger" content="Delete commande" >
+              <span className="text-lg text-danger cursor-pointer active:opacity-50" onClick={()=>deleteClient(user?.REF_BC)}>
                 <DeleteIcon />
               </span>
             </Tooltip>
@@ -271,10 +257,10 @@ export default function TableFournisseur() {
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
-            {/* <Dropdown>
+            <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
-                  Status
+                  Entropot
                 </Button>
               </DropdownTrigger>
               <DropdownMenu
@@ -286,12 +272,12 @@ export default function TableFournisseur() {
                 onSelectionChange={setStatusFilter}
               >
                 {statusOptions.map((status) => (
-                  <DropdownItem key={status.uid} className="capitalize">
-                    {capitalize(status.name)}
+                  <DropdownItem key={status.ENTROPOT} className="capitalize">
+                    {capitalize(status.ENTROPOT)}
                   </DropdownItem>
                 ))}
               </DropdownMenu>
-            </Dropdown> */}
+            </Dropdown>
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
@@ -302,8 +288,8 @@ export default function TableFournisseur() {
                 disallowEmptySelection
                 aria-label="Table Columns"
                 closeOnSelect={false}
-                className="h-[400px] overflow-y-scroll"
                 selectedKeys={visibleColumns}
+                className="h-[400px] overflow-y-scroll"
                 selectionMode="multiple"
                 onSelectionChange={setVisibleColumns}
               >
@@ -314,7 +300,7 @@ export default function TableFournisseur() {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Link href="/article/add">
+            <Link href="/commande/add">
               <Button color="primary" endContent={<PlusIcon />}>
                 Add New
               </Button>
@@ -322,7 +308,7 @@ export default function TableFournisseur() {
           </div>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-default-400 text-small">Total {users.length} articles</span>
+          <span className="text-default-400 text-small">Total {users.length} commandes</span>
           <label className="flex items-center text-default-400 text-small">
             Rows per page:
             <select
@@ -407,7 +393,7 @@ export default function TableFournisseur() {
           </TableColumn>
         )}
       </TableHeader>
-      <TableBody isLoading={isLoading} emptyContent={isLoading?<Spinner size="lg" />:"No articles found"} items={sortedItems}>
+      <TableBody isLoading={isLoading} emptyContent={isLoading?<Spinner size="lg" />:"No commandes found"} items={sortedItems}>
         {(item) => (
           <TableRow key={item?.REF_ART}>
             {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}

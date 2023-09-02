@@ -15,7 +15,8 @@ const SignIn = () => {
   const [isVisible, setIsVisible] = React.useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
 
-  const submitLogin=async()=>{
+  const submitLogin=async(e)=>{
+    e.preventDefault()
     console.log(username)
     const result=await signIn("credentials",{
       username:username,
@@ -27,7 +28,7 @@ const SignIn = () => {
   }
   return (
     <div className='w-full h-screen flex justify-center items-center'>
-        <div className='md:w-[400px] shadow-xl w-[300px] h-[400px] items-center justify-center flex flex-col gap-3 py-6 px-10'>
+        <form className='md:w-[400px] shadow-xl w-[300px] h-[400px] items-center  justify-center flex flex-col gap-3 py-6 px-10' onSubmit={submitLogin}>
             <Avatar showFallback src='https://images.unsplash.com/broken' classNames={{
           base: "bg-[#0000ff]/20",
           icon: "text-[#0000ff]/80",
@@ -61,10 +62,10 @@ const SignIn = () => {
               type={isVisible ? "text" : "password"}
               className=""
             />
-              <Button color="primary" className={`mt-3 w-full`} onClick={submitLogin}>
+              <Button color="primary" className={`mt-3 w-full`} type='submit'>
                 Log In
               </Button>
-        </div>
+        </form>
     </div>
   )
 }
