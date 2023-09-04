@@ -4,6 +4,8 @@ import {EditIcon} from "./EditIcon";
 import {DeleteIcon} from "./DeleteIcon";
 import {EyeIcon} from "./EyeIcon";
 import Link from "next/link"
+import Select from "react-select";
+
 import axios from "../../../axios"
 
 import { ToastContainer, toast } from 'react-toastify';
@@ -32,7 +34,7 @@ import {PlusIcon} from "./PlusIcon";
 import {VerticalDotsIcon} from "./VerticalDotsIcon";
 import {SearchIcon} from "./SearchIcon";
 import {ChevronDownIcon} from "./ChevronDownIcon";
-import {columns} from "./dataCommande";
+import {columns} from "./dataArticleChoosen";
 import {capitalize} from "./utils";
 
 // const statusColorMap = {
@@ -41,57 +43,67 @@ import {capitalize} from "./utils";
 //   vacation: "warning",
 // };
 
-const INITIAL_VISIBLE_COLUMNS = ["REF_BC","ARTICLE","FOURNISSEUR", "DATE_BC","MNT_HT","MNT_TTC","actions"];
+const INITIAL_VISIBLE_COLUMNS = ["REF_ART","ARTICLE","COLISAGE", "Nbcarton","Qte","Pachat","R%","Mt_HT","TVA2","Gratuit","Qte_rest","actions"];
 
-export default function TableFournisseur({choosen,setChoosen}) {
+export default function TableFournisseur() {
 
-  const deleteClient=async(id)=>{
-    await axios.delete(`/commande/delete/${id}`).then((res)=>{
-      console.log(res);
-      toast.success(res.data?.message, {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        })
-      setChanged(true)
-    })
-    .catch((err)=>{
-      toast.error(res.data?.message, {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        })
-    })
+  const deleteArticle=(id)=>{
+    setUsers((prev)=>prev.map((article)=>(
+      article.REF_ART!=id&&(article)
+    )))
   }
+
   const [statusOptions, setStatusOptions] = React.useState([]);
-  const [users, setUsers] = React.useState(choosen);
-  const [changed, setChanged] = React.useState(false);
+  const [users, setUsers] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [selectedOptions, setSelectedOptions] = React.useState();
+  const [article, setArticle] = React.useState();
+  const [articles, setArticles] = React.useState();
+  const [changed, setChanged] = React.useState();
 
-  useEffect(()=>{
-    const getCommande=async()=>{
-      const res =await axios.get("/commande/table")
-      const res2 =await axios.get("/utils/entropot")
-      console.log(res.data);
-      // setUsers(res.data)
-      setStatusOptions(res2.data)
+  React.useEffect(()=>{
+    const getArticles=async()=>{
+      const res =await axios.get("/article")
+      setArticles(res.data)
+      setArticle(res.data?.map((article)=>(
+        { value: article.REF_ART, label: article.ARTICLE }
+      )))
       setIsLoading(false)
+      console.log(article);
     }
-    getCommande()
-    setChanged(false)
-    setUsers(choosen)
-  },[changed,choosen])
+    getArticles()
+  },[changed])
 
+  function handleSelect(data) {
+    setSelectedOptions(data);
+  }
+
+  function addToTable(){
+    console.log(selectedOptions);
+    const choosenArticles = articles.filter((article) =>
+        Array.from([selectedOptions]?.map((selected)=>selected.value))?.includes(article.REF_ART)
+    ).map((article)=>(
+      {"REF_ART":article.REF_ART,"ARTICLE":article.ARTICLE,"COLISAGE":article.COLISAGE,"Nbcarton":nbcarton,"Qte":nbcarton*article.COLISAGE,"Pachat":pachat,"R%":remise,"Mt_HT":(pachat-(pachat*remise)/100)*nbcarton*article.COLISAGE,"TVA2":article.TVA2,"Gratuit":0,"Qte_rest":qte}
+    ));
+    
+    
+    console.log(choosenArticles)
+    setUsers((prev)=>[...prev,...choosenArticles])
+    console.log(users);
+
+  }
+  function editInTable(){
+    console.log(Array.from(selectedKeys)[0])
+    setUsers((prev)=>prev.map((article)=>(
+      article.REF_ART==Array.from(selectedKeys)[0]?{"REF_ART":article.REF_ART,"ARTICLE":article.ARTICLE,"COLISAGE":article.COLISAGE,"Nbcarton":nbcarton,"Qte":nbcarton*article.COLISAGE,"Pachat":pachat,"R%":remise,"Mt_HT":(pachat-(pachat*remise)/100)*nbcarton*article.COLISAGE,"TVA2":article.TVA2,"Gratuit":0,"Qte_rest":qte}:article
+    )))
+  }
+
+
+  const [nbcarton, setNbcarton] = React.useState(0);
+  const [qte, setQte] = React.useState(0);
+  const [pachat, setPachat] = React.useState(0);
+  const [remise, setRemise] = React.useState(0);
 
   const [filterValue, setFilterValue] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
@@ -205,7 +217,7 @@ export default function TableFournisseur({choosen,setChoosen}) {
               </Link>
             </Tooltip>
             <Tooltip color="danger" content="Delete commande" >
-              <span className="text-lg text-danger cursor-pointer active:opacity-50" onClick={()=>deleteClient(user?.REF_BC)}>
+              <span className="text-lg text-danger cursor-pointer active:opacity-50" onClick={()=>deleteArticle(user?.REF_ART)}>
                 <DeleteIcon />
               </span>
             </Tooltip>
@@ -243,95 +255,60 @@ export default function TableFournisseur({choosen,setChoosen}) {
     }
   }, []);
 
-  const topContent = React.useMemo(() => {
-    return (
-      <div className="flex flex-col gap-4">
-        <div className="flex justify-between gap-3 items-end">
-          <Input
-            isClearable
-            className="w-full sm:max-w-[44%]"
-            placeholder="Search by name..."
-            startContent={<SearchIcon />}
-            value={filterValue}
-            onClear={() => setFilterValue("")}
-            onValueChange={onSearchChange}
-          />
-          <div className="flex gap-3">
-            <Dropdown>
-              <DropdownTrigger className="hidden sm:flex">
-                <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
-                  Entropot
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                disallowEmptySelection
-                aria-label="Table Columns"
-                closeOnSelect={false}
-                selectedKeys={statusFilter}
-                selectionMode="multiple"
-                onSelectionChange={setStatusFilter}
-              >
-                {statusOptions.map((status) => (
-                  <DropdownItem key={status.ENTROPOT} className="capitalize">
-                    {capitalize(status.ENTROPOT)}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown>
-            <Dropdown>
-              <DropdownTrigger className="hidden sm:flex">
-                <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
-                  Columns
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                disallowEmptySelection
-                aria-label="Table Columns"
-                closeOnSelect={false}
-                selectedKeys={visibleColumns}
-                className="h-[400px] overflow-y-scroll"
-                selectionMode="multiple"
-                onSelectionChange={setVisibleColumns}
-              >
-                {columns.map((column) => (
-                  <DropdownItem key={column.uid} className="capitalize">
-                    {capitalize(column.name)}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown>
-            <Link href="/commande/add">
-              <Button color="primary" endContent={<PlusIcon />}>
-                Add New
-              </Button>
-            </Link>
+  const topContent = 
+          (<div className="flex flex-col gap-4"><div className="flex justify-between w-full gap-6">
+        <div className="w-full">
+          <h2>Choose your Article</h2>
+          <div className="dropdown-container">
+            <Select
+              options={article}
+              placeholder="Select article"
+              value={selectedOptions}
+              onChange={handleSelect}
+              isSearchable={true}
+            />
           </div>
         </div>
-        <div className="flex justify-between items-center">
-          <span className="text-default-400 text-small">Total {users.length} commandes</span>
-          <label className="flex items-center text-default-400 text-small">
-            Rows per page:
-            <select
-              className="bg-transparent outline-none text-default-400 text-small"
-              onChange={onRowsPerPageChange}
-            >
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="15">15</option>
-            </select>
-          </label>
+        <div className="w-full">
+          <h2>Choose your Fournisseur</h2>
+          <div className="dropdown-container">
+            <Select
+              options={article}
+              placeholder="Select article"
+              value={selectedOptions}
+              onChange={handleSelect}
+              isSearchable={true}
+              isMulti
+            />
+          </div>
         </div>
-      </div>
-    );
-  }, [
-    filterValue,
-    statusFilter,
-    visibleColumns,
-    onRowsPerPageChange,
-    users.length,
-    onSearchChange,
-    hasSearchFilter,
-  ]);
+        <div className="w-full">
+          <h2>Choose your Boutique</h2>
+          <div className="dropdown-container">
+            <Select
+              options={article}
+              placeholder="Select article"
+              value={selectedOptions}
+              onChange={handleSelect}
+              isSearchable={true}
+              isMulti
+            />
+          </div>
+        </div>
+    </div>
+    <div className="flex gap-6 justify-between">
+      <Input  label="Nb Carton" value={nbcarton} onValueChange={setNbcarton} placeholder="Enter your Nb Carton" type="number"  />
+      <Input  label="Qte" value={qte} onValueChange={setQte} placeholder="Enter your qte" type="number"  />
+    </div>
+    <div className="flex gap-6 justify-between">
+      <Input  label="Pachat" value={pachat} onValueChange={setPachat} placeholder="Enter your pachat" type="number"  />
+      <Input  label="Remise" value={remise} onValueChange={setRemise} placeholder="Enter your remise" type="number"  />
+    </div>
+    <div className="flex w-full gap-6">
+      <Button onClick={addToTable}>Add</Button>
+      <Button onClick={editInTable}>Edit</Button>
+    </div>
+    </div>)
 
   const bottomContent = React.useMemo(() => {
     return (
@@ -375,7 +352,7 @@ export default function TableFournisseur({choosen,setChoosen}) {
         wrapper: "max-h-[382px]",
       }}
       selectedKeys={selectedKeys}
-      selectionMode="multiple"
+      selectionMode="single"
       sortDescriptor={sortDescriptor}
       topContent={topContent}
       topContentPlacement="outside"

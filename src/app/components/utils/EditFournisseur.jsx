@@ -1,5 +1,5 @@
 "use client"
-
+import Select from "react-select";
 import React, { useRef,useEffect } from 'react'
 import {Tabs, Tab, Link, Button, Card, CardBody, CardHeader} from "@nextui-org/react";
 import {Dropdown, DropdownTrigger, DropdownMenu, DropdownItem} from "@nextui-org/react";
@@ -60,17 +60,11 @@ const EditFournisseur = ({fournisseur,disabled,title}) => {
 
   
 
-    const [selectedKeysDevise, setSelectedKeysDevise] = React.useState(new Set([fournisseur?.REF_DEVISE||"text"]));
-    const selectedValueDevise = React.useMemo(
-      () => Array.from(selectedKeysDevise).join(", ").replaceAll("_", " "),
-      [selectedKeysDevise]
-    );
+    const [selectedKeysDevise, setSelectedKeysDevise] = React.useState(fournisseur&&({value:fournisseur?.REF_DEVISE,label:modepaie?.filter((mode)=>mode.REF_DEVISE==fournisseur?.REF_DEVISE)[0]}));
+  
+    const [selectedKeysPaiement, setSelectedKeysPaiement] = React.useState(fournisseur&&({value:fournisseur?.REF_MODEPAIE,label:modepaie?.filter((mode)=>mode.REF_MODEPAIE==fournisseur?.REF_DEVISE)[0]}));
+    
 
-    const [selectedKeysPaiement, setSelectedKeysPaiement] = React.useState(new Set([fournisseur?.REF_MODEPAIE||"text"]));
-    const selectedValuePaiement = React.useMemo(
-      () => Array.from(selectedKeysPaiement).join(", ").replaceAll("_", " "),
-      [selectedKeysPaiement]
-    );
     const save = async() =>{
       setIsLoading(true)
       const payload={
@@ -85,8 +79,8 @@ const EditFournisseur = ({fournisseur,disabled,title}) => {
         ville:ville||null,
         telephone:tele||null,
         fax:fax||null,
-        modepaiement:+selectedValuePaiement.split(" ")[0]||null,
-        devise:selectedValueDevise.split(" ")[0]||null,
+        modepaiement:+selectedKeysPaiement?.value||null,
+        devise:selectedKeysDevise?.value||null,
         objectif:+objectif||null,
         siteWeb:site||null,
         email:email||null,
@@ -208,68 +202,34 @@ const EditFournisseur = ({fournisseur,disabled,title}) => {
               <div className="flex flex-col gap-4 h-fit border p-2 py-5 border-slate-400 rounded-xl">
                 <div className="flex justify-between gap-6">
                   <div className='flex flex-col gap-5'>
-                    <div className='flex justify-between'>
                       <div className="flex gap-3 items-center px-2">
                         <h3 className='font-medium text-sm '><pre>Mode de Paiment :</pre></h3>
-                        <Dropdown>
-                          <DropdownTrigger disabled={disabled}>
-                              <Button 
-                              variant="bordered" 
-                              className="capitalize px-16"
-                              >
-                              {selectedValuePaiement}
-                              </Button>
-                          </DropdownTrigger>
-                          <DropdownMenu 
-                              aria-label="Single selection actions"
-                              variant="flat"
-                              disallowEmptySelection
-                              selectionMode="single"
-                              selectedKeys={selectedKeysPaiement}
-                              onSelectionChange={setSelectedKeysPaiement}
-                              aria-disabled={disabled}
-                          >
-                            {
-                              modepaie?.map((mode)=>(
-                                <DropdownItem key={`${mode.REF_MODEPAIE}_${mode.MODEPAIE}`}>{`${mode.REF_MODEPAIE}_${mode.MODEPAIE}`}</DropdownItem>
-                              ))
-                            }
-                          </DropdownMenu>
-                        </Dropdown>
+                        <div className="dropdown-container w-[300px]">
+                          <Select
+                            options={modepaie?.map((mode)=>(
+                              {value:mode.REF_MODEPAIE,label:mode.MODEPAIE}
+                            ))}
+                            placeholder="Select mode de paiement"
+                            value={selectedKeysPaiement}
+                            onChange={(data)=>setSelectedKeysPaiement(data)}
+                            isSearchable={true}
+                          />
+                        </div>
                       </div>
-                    </div>
-
-
-                    <div className='flex justify-between'>
-                      <div className="flex gap-3 justify-center items-center px-2">
-                      <h3 className='font-medium text-sm '><pre>Devise          :</pre></h3>
-                      <Dropdown>
-                        <DropdownTrigger disabled={disabled}>
-                            <Button 
-                            variant="bordered" 
-                            className="capitalize px-16"
-                            >
-                            {selectedValueDevise}
-                            </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu 
-                            aria-label="Single selection actions"
-                            variant="flat"
-                            disallowEmptySelection
-                            selectionMode="single"
-                            selectedKeys={selectedKeysDevise}
-                            onSelectionChange={setSelectedKeysDevise}
-                            aria-disabled={disabled}
-                        >
-                            {
-                              devise?.map((dev)=>(
-                                <DropdownItem key={`${dev.REF_DEVISE}_${dev.DEVISE}`}>{`${dev.REF_DEVISE}_${dev.DEVISE}`}</DropdownItem>
-                              ))
-                            }
-                        </DropdownMenu>
-                      </Dropdown>
-                    </div>
-                    </div>
+                      <div className="flex gap-3 items-center px-2">
+                        <h3 className='font-medium text-sm '><pre>Devise          :</pre></h3>
+                        <div className="dropdown-container w-[300px]">
+                            <Select
+                              options={devise?.map((dev)=>(
+                                {value:dev.REF_DEVISE,label:dev.DEVISE}
+                              ))}
+                              placeholder="Select devise"
+                              value={selectedKeysDevise}
+                              onChange={(data)=>setSelectedKeysDevise(data)}
+                              isSearchable={true}
+                            />
+                          </div>
+                      </div>
                     <div className="flex justify-between gap-6">
                       <Input isDisabled={disabled}   label="Objectif" value={objectif} onValueChange={setObjectif} placeholder="Enter your Objectif" type="number" />
                       <Input isDisabled={disabled}    label="RFA" value={rfa} onValueChange={setRfa} placeholder="Enter your RFA" type="number"  />

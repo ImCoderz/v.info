@@ -1,5 +1,5 @@
 "use client"
-
+import Select from "react-select";
 import React, { useEffect, useRef } from 'react'
 import {Tabs, Tab, Link, Button, Card, CardBody, CardHeader} from "@nextui-org/react";
 import {Dropdown, DropdownTrigger, DropdownMenu, DropdownItem} from "@nextui-org/react";
@@ -70,40 +70,18 @@ const FormClient = ({client,disabled}) => {
 
 
 
-    function getKeyByValue(jsonObject, targetValue) {
-      // if(!jsonObject) return null
-      for (const key in jsonObject) {
-          if (jsonObject.hasOwnProperty(key) && jsonObject[key] === targetValue) {
-              return key;
-          }
-      }
-      return "Select a value";
-   }
   
-    const [selectedKeysDevise, setSelectedKeysDevise] = React.useState(new Set(["Select a value"]));
-    const selectedValueDevise = React.useMemo(
-      () => Array.from(selectedKeysDevise).join(", ").replaceAll("_", " "),
-      [selectedKeysDevise]
-    );
+  const [selectedKeysDevise, setSelectedKeysDevise] = React.useState(client&&({value:client?.REF_DEVISE,label:modepaie?.filter((mode)=>mode.REF_DEVISE==client?.REF_DEVISE)[0]}));    
 
-    const [selectedKeysCommercial, setSelectedKeysCommercial] = React.useState(new Set([client?.CODE_COM||"Select a value"]));
-    const selectedValueCommercial = React.useMemo(
-      () => Array.from(selectedKeysCommercial).join(", ").replaceAll("_", " "),
-      [selectedKeysCommercial]
-    );
+    const [selectedKeysCommercial, setSelectedKeysCommercial] = React.useState(client&&({value:client?.CODE_COM,label:modepaie?.filter((mode)=>mode.REF_DEVISE==client?.CODE_COM)[0]}));
+    
 
-    const [selectedKeysPaiement, setSelectedKeysPaiement] = React.useState(new Set([client?.REF_MODEPAIE||"Select a value"]));
+    const [selectedKeysPaiement, setSelectedKeysPaiement] = React.useState(client&&({value:client?.REF_MODEPAIE,label:modepaie?.filter((mode)=>mode.REF_DEVISE==client?.REF_MODEPAIE)[0]}));
     
-    const selectedValuePaiement = React.useMemo(
-      () => Array.from(selectedKeysPaiement).join(", ").replaceAll("_", " "),
-      [selectedKeysPaiement]
-    );
-    const [selectedKeysPaiementPremier, setSelectedKeysPaiementPremier] = React.useState(new Set([client?.ref_modepaiepremier||"Select a value"]));
+   
+    const [selectedKeysPaiementPremier, setSelectedKeysPaiementPremier] = React.useState(client&&({value:client?.ref_modepaiepremier,label:modepaie?.filter((mode)=>mode.REF_DEVISE==client?.ref_modepaiepremier)[0]}));
     
-    const selectedValuePaiementPremier = React.useMemo(
-      () => Array.from(selectedKeysPaiementPremier).join(", ").replaceAll("_", " "),
-      [selectedKeysPaiementPremier]
-    );
+
     function is_numeric(str){
       return /^\d+$/.test(str);
   }
@@ -140,10 +118,10 @@ const FormClient = ({client,disabled}) => {
         bloqued:isBloqued||false,
         plafonne:isPlafonne||false,
         factur:isFactur||false,
-        REF_MODEPAIE:+selectedValuePaiement.split(" ")[0]||null,
-        ref_modepaiepremier:+selectedValuePaiementPremier.split(" ")[0]||null,
-        CODE_COM:selectedValueCommercial.split(" ")[0]||null,
-        devise:selectedValueDevise.split(" ")[0]||null,
+        REF_MODEPAIE:+selectedKeysPaiement?.value||null,
+        ref_modepaiepremier:+selectedKeysPaiementPremier?.value||null,
+        CODE_COM:selectedKeysCommercial?.value||null,
+        devise:selectedKeysDevise?.value||null,
       }
       if(!is_numeric(reference)){
         toast.error("Reference should be a digit", {
@@ -284,127 +262,68 @@ const FormClient = ({client,disabled}) => {
               <div className="flex flex-col gap-4 h-fit border p-2 py-5 border-slate-400 rounded-xl">
                 <div className="flex justify-between gap-6">
                   <div className='flex flex-col gap-5'>
-                    <div className='flex justify-between'>
                       <div className="flex gap-3 items-center px-2">
                         <h3 className='font-medium text-sm '><pre>Mode de Paiment  :</pre></h3>
-                        <Dropdown>
-                          <DropdownTrigger disabled={disabled}>
-                              <Button 
-                              variant="bordered" 
-                              className="capitalize px-16"
-                              >
-                              {selectedValuePaiement}
-                              </Button>
-                          </DropdownTrigger>
-                          <DropdownMenu 
-                              aria-label="Single selection actions"
-                              variant="flat"
-                              disallowEmptySelection
-                              selectionMode="single"
-                              selectedKeys={selectedKeysPaiement}
-                              onSelectionChange={setSelectedKeysPaiement}
-                              aria-disabled={disabled}
-                          >
-                            {
-                              modepaie?.map((mode)=>(
-                                <DropdownItem key={`${mode.REF_MODEPAIE}_${mode.MODEPAIE}`}>{`${mode.REF_MODEPAIE}_${mode.MODEPAIE}`}</DropdownItem>
-                              ))
-                            }
-                          </DropdownMenu>
-                        </Dropdown>
+                        <div className="dropdown-container w-[300px]">
+                          <Select
+                            options={modepaie?.map((mode)=>(
+                              {value:mode.REF_MODEPAIE,label:mode.MODEPAIE}
+                            ))}
+                            placeholder="Select mode de paiement"
+                            value={selectedKeysPaiement}
+                            onChange={(data)=>setSelectedKeysPaiement(data)}
+                            isSearchable={true}
+                          />
+                        </div>
+                       
                       </div>
-                    </div>
+                    
 
 
-                    <div className='flex justify-between'>
-                      <div className="flex gap-3 justify-center items-center px-2">
+                      <div className="flex gap-3  items-center px-2">
                       <h3 className='font-medium text-sm '><pre>Commercial       :</pre></h3>
-                      <Dropdown>
-                        <DropdownTrigger disabled={disabled}>
-                            <Button 
-                            variant="bordered" 
-                            className="capitalize px-16"
-                            >
-                            {selectedValueCommercial}
-                            </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu 
-                            aria-label="Single selection actions"
-                            variant="flat"
-                            disallowEmptySelection
-                            selectionMode="single"
-                            selectedKeys={selectedKeysCommercial}
-                            onSelectionChange={setSelectedKeysCommercial}
-                            aria-disabled={disabled}
-                        >
-                            {
-                              commercial?.map((com)=>(
-                                <DropdownItem key={`${com.REF_COMMERCIAL}_${com.NOM}`}>{`${com.REF_COMMERCIAL}_${com.NOM}`}</DropdownItem>
-                              ))
-                            }
-                        </DropdownMenu>
-                      </Dropdown>
-                    </div>
-                    </div>
-                    <div className='flex justify-between'>
-                      <div className="flex gap-3 justify-center items-center px-2">
-                      <h3 className='font-medium text-sm '><pre>Devise           :</pre></h3>
-                      <Dropdown>
-                        <DropdownTrigger disabled={disabled}>
-                            <Button 
-                            variant="bordered" 
-                            className="capitalize px-16"
-                            >
-                            {selectedValueDevise}
-                            </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu 
-                            aria-label="Single selection actions"
-                            variant="flat"
-                            disallowEmptySelection
-                            selectionMode="single"
-                            selectedKeys={selectedKeysDevise}
-                            onSelectionChange={setSelectedKeysDevise}
-                            aria-disabled={disabled}
-                        >
-                            {
-                              devise?.map((dev)=>(
-                                <DropdownItem key={`${dev.REF_DEVISE}_${dev.DEVISE}`}>{`${dev.REF_DEVISE}_${dev.DEVISE}`}</DropdownItem>
-                              ))
-                            }
-                        </DropdownMenu>
-                      </Dropdown>
+                      <div className="dropdown-container w-[300px]">
+                            <Select
+                              options={commercial?.map((com)=>(
+                                {value:com.REF_COMMERCIAL,label:com.NOM}
+                              ))}
+                              placeholder="Select commmercial"
+                              value={selectedKeysCommercial}
+                              onChange={(data)=>setSelectedKeysCommercial(data)}
+                              isSearchable={true}
+                            />
+                          </div>
                       
                     </div>
+                      <div className="flex gap-3 items-center px-2">
+                      <h3 className='font-medium text-sm '><pre>Devise           :</pre></h3>
+                      <div className="dropdown-container w-[300px]">
+                            <Select
+                              options={devise?.map((dev)=>(
+                                {value:dev.REF_DEVISE,label:dev.DEVISE}
+                              ))}
+                              placeholder="Select devise"
+                              value={selectedKeysDevise}
+                              onChange={(data)=>setSelectedKeysDevise(data)}
+                              isSearchable={true}
+                            />
+                          </div>
+                      
                     </div>
                     <div className='flex justify-between'>
-                      <div className="flex gap-3 justify-center items-center px-2">
+                      <div className="flex gap-3  items-center px-2">
                       <h3 className='font-medium text-sm '><pre>Mode paiement    :</pre></h3>
-                      <Dropdown>
-                        <DropdownTrigger disabled={disabled}>
-                            <Button 
-                            variant="bordered" 
-                            className="capitalize px-16"
-                            >
-                            {selectedValuePaiementPremier}
-                            </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu 
-                            aria-label="Single selection actions"
-                            variant="flat"
-                            disallowEmptySelection
-                            selectionMode="single"
-                            selectedKeys={selectedKeysPaiementPremier}
-                            onSelectionChange={setSelectedKeysPaiementPremier}
-                            aria-disabled={disabled}
-                        >
-                            {
-                              modepaie?.map((mode)=>(
-                                <DropdownItem key={`${mode.REF_MODEPAIE}_${mode.MODEPAIE}`}>{`${mode.REF_MODEPAIE}_${mode.MODEPAIE}`}</DropdownItem>
-                              ))
-                            }
-                        </DropdownMenu>
-                      </Dropdown>
+                      <div className="dropdown-container w-[300px]">
+                          <Select
+                            options={modepaie?.map((mode)=>(
+                              {value:mode.REF_MODEPAIE,label:mode.MODEPAIE}
+                            ))}
+                            placeholder="Select mode de paiement"
+                            value={selectedKeysPaiementPremier}
+                            onChange={(data)=>setSelectedKeysPaiementPremier(data)}
+                            isSearchable={true}
+                          />
+                        </div>
                     </div>
                     </div>
                     <div className="flex justify-between gap-6">

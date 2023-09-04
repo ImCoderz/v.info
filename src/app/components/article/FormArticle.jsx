@@ -1,4 +1,5 @@
 "use client"
+import Select from "react-select";
 
 import React, { useEffect, useRef } from 'react'
 import {Tabs, Tab, Link, Button, Card, CardBody, CardHeader} from "@nextui-org/react";
@@ -14,9 +15,10 @@ import {Input} from "@nextui-org/react";
 const FormArticle = ({article,disabled}) => {
   useEffect(()=>{
     const getModepaie=async()=>{
-      const res1 =await axios.get(`/utils/modepaiement`)
-      const res2 =await axios.get(`/utils/commercial`)
-      const res3 =await axios.get(`/utils/devise`)
+      // const res1 =await axios.get(`/utils/modepaiement`)
+      // const res2 =await axios.get(`/utils/commercial`)
+      // const res3 =await axios.get(`/utils/devise`)
+
       const res4 =await axios.get(`/utils/taille`)
       const res5 =await axios.get(`/utils/categorietaille`)
       const res6 =await axios.get(`/utils/couleur`)
@@ -32,9 +34,9 @@ const FormArticle = ({article,disabled}) => {
       const res16=await axios.get(`/utils/saison`)
 
 
-      setModepaie(res1.data);
-      setCommercial(res2.data);
-      setDevise(res3.data);
+      // setModepaie(res1.data);
+      // setCommercial(res2.data);
+      // setDevise(res3.data);
       setTaille(res4.data);
       setCategorietaille(res5.data);
       setCouleur(res6.data);
@@ -54,9 +56,11 @@ const FormArticle = ({article,disabled}) => {
 
   const [isLoading, setIsLoading] = React.useState();
 
-  const [modepaie, setModepaie] = React.useState();
-  const [commercial, setCommercial] = React.useState();
-  const [devise, setDevise] = React.useState();
+  // const [modepaie, setModepaie] = React.useState();
+  // const [commercial, setCommercial] = React.useState();
+  // const [devise, setDevise] = React.useState();
+
+
   const [taille, setTaille] = React.useState();
   const [categorietaille, setCategorietaille] = React.useState();
   const [couleur, setCouleur] = React.useState();
@@ -168,117 +172,53 @@ const FormArticle = ({article,disabled}) => {
       return "Select a value";
    }
   
-    const [selectedKeysDevise, setSelectedKeysDevise] = React.useState(new Set(["text"]));
-    const selectedValueDevise = React.useMemo(
-      () => Array.from(selectedKeysDevise).join(", ").replaceAll("_", " "),
-      [selectedKeysDevise]
-    );
-    const [selectedKeysTaille, setSelectedKeysTaille] = React.useState(new Set([article&&(article?.REFTAILLE+" "+article?.TAILLE)||"Select a value"]));
-    const selectedValueTaille = React.useMemo(
-      () => Array.from(selectedKeysTaille).join(", ").replaceAll("_", " "),
-      [selectedKeysTaille]
-    );
-    const [selectedKeysCouleur, setSelectedKeysCouleur] = React.useState(new Set([article&&(article?.REFCOULEUR+" "+article?.COULEUR)||"Select a value"]));
-    const selectedValueCouleur = React.useMemo(
-      () => Array.from(selectedKeysCouleur).join(", ").replaceAll("_", " "),
-      [selectedKeysCouleur]
-    );
-    const [selectedKeysCategorietaille, setSelectedKeysCategorietaille] = React.useState(new Set([article?.REFCATEG||"Select a value"]));
-    const selectedValueCategorietaille = React.useMemo(
-      () => Array.from(selectedKeysCategorietaille).join(", ").replaceAll("_", " "),
-      [selectedKeysCategorietaille]
-    );
-    const [selectedKeysMarque, setSelectedKeysMarque] = React.useState(new Set([article?.REF_MARQ||"Select a value"]));
-    const selectedValueMarque = React.useMemo(
-      () => Array.from(selectedKeysMarque).join(", ").replaceAll("_", " "),
-      [selectedKeysMarque]
-    );
-
-
-    const [selectedKeysSecteur, setSelectedKeysSecteur] = React.useState(new Set([article?.ref_dep||"Select a value"]));
-    const selectedValueSecteur = React.useMemo(
-      () => Array.from(selectedKeysSecteur).join(", ").replaceAll("_", " "),
-      [selectedKeysSecteur]
-    );
-    const [selectedKeysRayon, setSelectedKeysRayon] = React.useState(new Set([article?.REF_RAY||"Select a value"]));
-    const selectedValueRayon = React.useMemo(
-      () => Array.from(selectedKeysRayon).join(", ").replaceAll("_", " "),
-      [selectedKeysRayon]
-    );
-    const [selectedKeysSrayon, setSelectedKeysSrayon] = React.useState(new Set([article?.REF_SRAY||"Select a value"]));
-    const selectedValueSrayon = React.useMemo(
-      () => Array.from(selectedKeysSrayon).join(", ").replaceAll("_", " "),
-      [selectedKeysSrayon]
-    );
-    const [selectedKeysFamille, setSelectedKeysFamille] = React.useState(new Set([article?.REF_FAM||"Select a value"]));
-    const selectedValueFamille = React.useMemo(
-      () => Array.from(selectedKeysFamille).join(", ").replaceAll("_", " "),
-      [selectedKeysFamille]
-    );
-    const [selectedKeysSfamille, setSelectedKeysSfamille] = React.useState(new Set([article?.REF_SFAM||"Select a value"]));
-    const selectedValueSfamille = React.useMemo(
-      () => Array.from(selectedKeysSfamille).join(", ").replaceAll("_", " "),
-      [selectedKeysSfamille]
-    );
-    const [selectedKeysSegment, setSelectedKeysSegment] = React.useState(new Set([article?.ref_ssfam||"Select a value"]));
-    const selectedValueSegment = React.useMemo(
-      () => Array.from(selectedKeysSegment).join(", ").replaceAll("_", " "),
-      [selectedKeysSegment]
-    );
-    const [selectedKeysActivite, setSelectedKeysActivite] = React.useState(new Set([article?.REFACTIVITE||"Select a value"]));
-    const selectedValueActivite = React.useMemo(
-      () => Array.from(selectedKeysActivite).join(", ").replaceAll("_", " "),
-      [selectedKeysActivite]
-    );
-    const [selectedKeysSaison, setSelectedKeysSaison] = React.useState(new Set([article?.REFSAISON||"Select a value"]));
-    const selectedValueSaison = React.useMemo(
-      () => Array.from(selectedKeysSaison).join(", ").replaceAll("_", " "),
-      [selectedKeysSaison]
-    );
-
-
-
-
-
-
-
-
-
-
-    const [selectedKeysCommercial, setSelectedKeysCommercial] = React.useState(new Set(["text"]));
-    const selectedValueCommercial = React.useMemo(
-      () => Array.from(selectedKeysCommercial).join(", ").replaceAll("_", " "),
-      [selectedKeysCommercial]
-    );
-
-    const [selectedKeysPaiement, setSelectedKeysPaiement] = React.useState(new Set([article?.REF_MODEPAIE||"Select a value"]));
     
-    const selectedValuePaiement = React.useMemo(
-      () => Array.from(selectedKeysPaiement).join(", ").replaceAll("_", " "),
-      [selectedKeysPaiement]
-    );
+    const [selectedKeysTaille, setSelectedKeysTaille] = React.useState(article&&({value:article?.REFTAILLE,label:article?.TAILLE}));
+   
 
-    const [selectedKeysTva1, setSelectedKeysTva1] = React.useState(new Set([article?.TVA1||"Select a value"]));
+    const [selectedKeysCouleur, setSelectedKeysCouleur] = React.useState(article&&({value:article?.REFCOULEUR,label:article?.COULEUR}));
     
-    const selectedValueTva1 = React.useMemo(
-      () => Array.from(selectedKeysTva1).join(", ").replaceAll("_", " "),
-      [selectedKeysTva1]
-    );
-    const [selectedKeysTva2, setSelectedKeysTva2] = React.useState(new Set([article?.TVA2||"Select a value"]));
+
+    const [selectedKeysCategorietaille, setSelectedKeysCategorietaille] = React.useState(article&&({value:article?.REFCATEG,label:categorietaille?.filter((mode)=>mode.REFCATEG==article?.REFCATEG)[0]}));
+   
     
-    const selectedValueTva2 = React.useMemo(
-      () => Array.from(selectedKeysTva2).join(", ").replaceAll("_", " "),
-      [selectedKeysTva2]
-    );
+    const [selectedKeysMarque, setSelectedKeysMarque] = React.useState(article&&({value:article?.REF_MARQ,label:marque?.filter((mode)=>mode.REF_MARQ==article?.REF_MARQ)[0]}));
+    
 
 
+    const [selectedKeysSecteur, setSelectedKeysSecteur] = React.useState(article&&({value:article?.ref_dep,label:secteur?.filter((mode)=>mode.ref_dep==article?.ref_dep)[0]}));
+    
+    
+    const [selectedKeysRayon, setSelectedKeysRayon] = React.useState(article&&({value:article?.REF_RAY,label:rayon?.filter((mode)=>mode.REF_RAY==article?.REF_RAY)[0]}));
+    
+    
+    const [selectedKeysSrayon, setSelectedKeysSrayon] = React.useState(article&&({value:article?.REF_SRAY,label:srayon?.filter((mode)=>mode.REF_SRAY==article?.REF_SRAY)[0]}));
+    
+    
+    const [selectedKeysFamille, setSelectedKeysFamille] = React.useState(article&&({value:article?.ref_fam,label:famille?.filter((mode)=>mode.ref_fam==article?.ref_fam)[0]}));
+    
+    
+    const [selectedKeysSfamille, setSelectedKeysSfamille] = React.useState(article&&({value:article?.ref_sfam,label:sfamille?.filter((mode)=>mode.ref_sfam==article?.ref_sfam)[0]}));
+    
+    
+    const [selectedKeysSegment, setSelectedKeysSegment] = React.useState(article&&({value:article?.ref_ssfam,label:segment?.filter((mode)=>mode.ref_ssfam==article?.ref_ssfam)[0]}));
+    
+    
+    const [selectedKeysActivite, setSelectedKeysActivite] = React.useState(article&&({value:article?.REFACTIVITE,label:activite?.filter((mode)=>mode.REFACTIVITE==article?.REFACTIVITE)[0]}));
+    
+    
+    const [selectedKeysSaison, setSelectedKeysSaison] = React.useState(article&&({value:article?.REFSAISON,label:saison?.filter((mode)=>mode.REFSAISON==article?.REFSAISON)[0]}));
+    
+
+
+    const [selectedKeysTva1, setSelectedKeysTva1] = React.useState(article&&({value:article?.TVA1,label:article?.TVA1}));
+    
+    
+    
+    const [selectedKeysTva2, setSelectedKeysTva2] = React.useState(article&&({value:article?.TVA2,label:article?.TVA2}));
+    
+    
   
-    const [selectedKeysPaiementPremier, setSelectedKeysPaiementPremier] = React.useState(new Set([article?.ref_modepaiepremier||"Select a value"]));
-    
-    const selectedValuePaiementPremier = React.useMemo(
-      () => Array.from(selectedKeysPaiementPremier).join(", ").replaceAll("_", " "),
-      [selectedKeysPaiementPremier]
-    );
     const save = async() =>{
       setIsLoading(true)
       const payload={
@@ -287,12 +227,12 @@ const FormArticle = ({article,disabled}) => {
         compte_compt:comptable||null,
         ARTICLE:designation||null,
         MODELE:modele||null,
-        TAILLE:+selectedValueTaille.split(" ")[1]=="Select"?null:+selectedValueTaille.split(" ")[1],
-        REFTAILLE:selectedValueTaille.split(" ")[0]=="Select"?null:selectedValueTaille.split(" ")[0],
-        REFCOULEUR:selectedValueCouleur.split(" ")[0]=="Select"?null:selectedValueCouleur.split(" ")[0],
-        COULEUR:selectedValueCouleur.split(" ")[1]=="Select"?null:selectedValueCouleur.split(" ")[1],
-        REFCATEG:selectedValueCategorietaille.split(" ")[0]=="Select"?null:selectedValueCategorietaille.split(" ")[0],
-        REF_MARQ:selectedValueMarque.split(" ")[0]=="Select"?null:selectedValueMarque.split(" ")[0],
+        TAILLE:selectedKeysTaille?.label||null,
+        REFTAILLE:selectedKeysTaille?.value||null,
+        REFCOULEUR:selectedKeysCouleur?.value||null,
+        COULEUR:selectedKeysCouleur?.label||null,
+        REFCATEG:selectedKeysCategorietaille?.value||null,
+        REF_MARQ:selectedKeysMarque?.value||null,
         cout:+cout||null,
         cout1:+cout1||null,
         cout2:+cout2||null,
@@ -302,8 +242,8 @@ const FormArticle = ({article,disabled}) => {
         PA_TTC:+pattc||null,
         PV_HT:+pvht||null,
         PV_TTC:+pvttc||null,
-        TVA1:+selectedValueTva1||null,
-        TVA2:+selectedValueTva2||null,
+        TVA1:+selectedKeysTva1?.value||null,
+        TVA2:+selectedKeysTva2?.value||null,
         tarif1:+tarif1||null,
         tarif2:+tarif2||null,
         tarif3:+tarif3||null,
@@ -316,14 +256,14 @@ const FormArticle = ({article,disabled}) => {
         tarif10:+tarif10||null,
         PESAGE:pesableinfo||null,
         PLU:plu||null,
-        ref_dep:selectedValueSecteur.split(" ")[0]=="Select"?null:selectedValueSecteur.split(" ")[0],
-        REF_RAY:selectedValueRayon.split(" ")[0]=="Select"?null:selectedValueRayon.split(" ")[0],
-        REF_SRAY:selectedValueSrayon.split(" ")[0]=="Select"?null:selectedValueSrayon.split(" ")[0],
-        REF_FAM:selectedValueFamille.split(" ")[0]=="Select"?null:selectedValueFamille.split(" ")[0],
-        REF_SFAM:selectedValueSfamille.split(" ")[0]=="Select"?null:selectedValueSfamille.split(" ")[0],
-        ref_ssfam:selectedValueSegment.split(" ")[0]=="Select"?null:selectedValueSegment.split(" ")[0],
-        REFACTIVITE:selectedValueActivite.split(" ")[0]=="Select"?null:selectedValueActivite.split(" ")[0],
-        REFSAISON:selectedValueSaison.split(" ")[0]=="Select"?null:selectedValueSaison.split(" ")[0],
+        ref_dep:selectedKeysSecteur?.value||null,
+        REF_RAY:selectedKeysRayon?.value||null,
+        REF_SRAY:selectedKeysSrayon?.value||null,
+        REF_FAM:selectedKeysFamille?.value||null,
+        REF_SFAM:selectedKeysSfamille?.value||null,
+        ref_ssfam:selectedKeysSegment?.value||null,
+        REFACTIVITE:selectedKeysActivite?.value||null,
+        REFSAISON:selectedKeysSaison?.value||null,
         CF1:iscf1||false,
         CF2:iscf2||false,
         CF3:iscf3||false,
@@ -437,133 +377,65 @@ const FormArticle = ({article,disabled}) => {
                   </div>
                     
                   <div className='flex flex-col gap-5'>
-                    <div className='flex justify-between'>
                       <div className="flex gap-3 items-center px-2">
                         <h3 className='font-medium text-sm '><pre>Taille             :</pre></h3>
-                        <Dropdown>
-                          <DropdownTrigger disabled={disabled}>
-                              <Button 
-                              variant="bordered" 
-                              className="capitalize px-16"
-                              >
-                              {selectedValueTaille}
-                              </Button>
-                          </DropdownTrigger>
-                          <DropdownMenu 
-                              aria-label="Single selection actions"
-                              variant="flat"
-                              className='max-h-[200px] overflow-y-scroll'
-                              disallowEmptySelection
-                              selectionMode="single"
-                              selectedKeys={selectedKeysTaille}
-                              onSelectionChange={setSelectedKeysTaille}
-                              aria-disabled={disabled}
-                          >
-                            {
-                              taille?.map((mode)=>(
-                                <DropdownItem key={`${mode.REFTAILLE}_${mode.TAILLE}`}>{`${mode.REFTAILLE}_${mode.TAILLE}`}</DropdownItem>
-                              ))
-                            }
-                          </DropdownMenu>
-                        </Dropdown>
+                        <div className="dropdown-container w-[300px]">
+                            <Select
+                              options={taille?.map((tail)=>(
+                                {value:tail.REFTAILLE,label:tail.TAILLE}
+                              ))}
+                              placeholder="Select a taille"
+                              value={selectedKeysTaille}
+                              onChange={(data)=>setSelectedKeysTaille(data)}
+                              isSearchable={true}
+                            />
+                          </div>
                       </div>
-                    </div>
 
 
-                    <div className='flex justify-between'>
-                      <div className="flex gap-3 justify-center items-center px-2">
+                      <div className="flex gap-3 items-center px-2">
                       <h3 className='font-medium text-sm '><pre>Categorie taille   :</pre></h3>
-                      <Dropdown>
-                        <DropdownTrigger disabled={disabled}>
-                            <Button 
-                            variant="bordered" 
-                            className="capitalize px-16"
-                            >
-                            {selectedValueCategorietaille}
-                            </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu 
-                            aria-label="Single selection actions"
-                            variant="flat"
-                            className='max-h-[200px] overflow-y-scroll'
-                            disallowEmptySelection
-                            selectionMode="single"
-                            selectedKeys={selectedKeysCategorietaille}
-                            onSelectionChange={setSelectedKeysCategorietaille}
-                            aria-disabled={disabled}
-                        >
-                            {
-                              categorietaille?.map((ct)=>(
-                                <DropdownItem key={`${mode.REFCATEG}_${mode.CATEGORIETAILLE}`}>{`${mode.REFCATEG}_${mode.CATEGORIETAILLE}`}</DropdownItem>
-                              ))
-                            }
-                        </DropdownMenu>
-                      </Dropdown>
+                      <div className="dropdown-container w-[300px]">
+                            <Select
+                              options={categorietaille?.map((cat)=>(
+                                {value:cat.REFCATEG,label:cat.categorietaille}
+                              ))}
+                              placeholder="Select a categorie taille"
+                              value={selectedKeysCategorietaille}
+                              onChange={(data)=>setSelectedKeysCategorietaille(data)}
+                              isSearchable={true}
+                            />
+                          </div>
                     </div>
-                    </div>
-                    <div className='flex justify-between'>
-                      <div className="flex gap-3 justify-center items-center px-2">
+                      <div className="flex gap-3 items-center px-2">
                       <h3 className='font-medium text-sm '><pre>Couleur            :</pre></h3>
-                      <Dropdown>
-                        <DropdownTrigger disabled={disabled}>
-                            <Button 
-                            variant="bordered" 
-                            className="capitalize px-16"
-                            >
-                            {selectedValueCouleur}
-                            </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu 
-                            aria-label="Single selection actions"
-                            variant="flat"
-                            disallowEmptySelection
-                            selectionMode="single"
-                            className='max-h-[200px] overflow-y-scroll'
-
-                            selectedKeys={selectedKeysCouleur}
-                            onSelectionChange={setSelectedKeysCouleur}
-                            aria-disabled={disabled}
-                        >
-                            {
-                              couleur?.map((cou)=>(
-                                <DropdownItem key={`${cou.Refcouleur}_${cou.COULEUR}`}>{`${cou.Refcouleur}_${cou.COULEUR}`}</DropdownItem>
-                              ))
-                            }
-                        </DropdownMenu>
-                      </Dropdown>
+                      <div className="dropdown-container w-[300px]">
+                            <Select
+                              options={couleur?.map((coul)=>(
+                                {value:coul.Refcouleur,label:coul.COULEUR}
+                              ))}
+                              placeholder="Select a couleur"
+                              value={selectedKeysCouleur}
+                              onChange={(data)=>setSelectedKeysCouleur(data)}
+                              isSearchable={true}
+                            />
+                          </div>
                       
+                   
                     </div>
-                    </div>
-                    <div className='flex justify-between'>
-                      <div className="flex gap-3 justify-center items-center px-2">
+                      <div className="flex gap-3  items-center px-2">
                       <h3 className='font-medium text-sm '><pre>Marque             :</pre></h3>
-                      <Dropdown>
-                        <DropdownTrigger disabled={disabled}>
-                            <Button 
-                            variant="bordered" 
-                            className="capitalize px-16"
-                            >
-                            {selectedValueMarque}
-                            </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu 
-                            aria-label="Single selection actions"
-                            variant="flat"
-                            disallowEmptySelection
-                            className='max-h-[200px] overflow-y-scroll'
-                            selectionMode="single"
-                            selectedKeys={selectedKeysMarque}
-                            onSelectionChange={setSelectedKeysMarque}
-                            aria-disabled={disabled}
-                        >
-                            {
-                              marque?.map((mode)=>(
-                                <DropdownItem key={`${mode.REF_MARQ}_${mode.MARQUE}`}>{`${mode.REF_MARQ}_${mode.MARQUE}`}</DropdownItem>
-                              ))
-                            }
-                        </DropdownMenu>
-                      </Dropdown>
-                    </div>
+                      <div className="dropdown-container w-[300px]">
+                            <Select
+                              options={marque?.map((marq)=>(
+                                {value:marq.REF_MARQ,label:marq.MARQUE}
+                              ))}
+                              placeholder="Select a taille"
+                              value={selectedKeysMarque}
+                              onChange={(data)=>setSelectedKeysMarque(data)}
+                              isSearchable={true}
+                            />
+                          </div>
                     </div>
                 </div>
                 </div>
@@ -574,71 +446,37 @@ const FormArticle = ({article,disabled}) => {
                 <h2 className=' font-medium text-sm'>Prix</h2>
                 <div className="flex justify-between gap-6">
                     <Input isDisabled={disabled}   label="Cout"  value={cout} onValueChange={setCout} placeholder="Enter your Cout" type="text"  />
-                    <div className='flex justify-between'>
                       <div className="flex gap-3 justify-center items-center px-2">
                       <h3 className='font-medium text-sm '><pre>Tva1             :</pre></h3>
-                      <Dropdown>
-                        <DropdownTrigger disabled={disabled}>
-                            <Button 
-                            variant="bordered" 
-                            className="capitalize px-16"
-                            >
-                            {selectedValueTva1}
-                            </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu 
-                            aria-label="Single selection actions"
-                            variant="flat"
-                            disallowEmptySelection
-                            className='max-h-[200px] overflow-y-scroll'
-                            selectionMode="single"
-                            selectedKeys={selectedKeysTva1}
-                            onSelectionChange={setSelectedKeysTva1}
-                            aria-disabled={disabled}
-                        >
-                            {
-                              tva?.map((tv)=>(
-                                <DropdownItem key={tv.TVA1}>{tv.TVA1}</DropdownItem>
-                              ))
-                            }
-                        </DropdownMenu>
-                      </Dropdown>
-                    </div>
+                      <div className="dropdown-container w-[300px]">
+                            <Select
+                              options={tva?.map((tv)=>(
+                                {value:tv.TVA1,label:tv.TVA1}
+                              ))}
+                              placeholder="Select tva1"
+                              value={selectedKeysTva1}
+                              onChange={(data)=>setSelectedKeysTva1(data)}
+                              isSearchable={true}
+                            />
+                          </div>
                     </div>
                     <Input isDisabled={disabled}   label="Prix achat(HT)" value={paht} onValueChange={setPaht} placeholder="Enter your pays" type="text" />
                 </div>
                 <div className="flex justify-between gap-6">
                     <Input isDisabled={disabled}   label="Adresse Livraison 2"  value={pvht} onValueChange={setPvht} placeholder="Enter your Adresse" type="text" />
-                    <div className='flex justify-between'>
                       <div className="flex gap-3 justify-center items-center px-2">
                       <h3 className='font-medium text-sm '><pre>Tva2             :</pre></h3>
-                      <Dropdown>
-                        <DropdownTrigger disabled={disabled}>
-                            <Button 
-                            variant="bordered" 
-                            className="capitalize px-16"
-                            >
-                            {selectedValueTva2}
-                            </Button>
-                        </DropdownTrigger>
-                        <DropdownMenu 
-                            aria-label="Single selection actions"
-                            variant="flat"
-                            disallowEmptySelection
-                            className='max-h-[200px] overflow-y-scroll'
-                            selectionMode="single"
-                            selectedKeys={selectedKeysTva2}
-                            onSelectionChange={setSelectedKeysTva2}
-                            aria-disabled={disabled}
-                        >
-                           {
-                              tva?.map((tv)=>(
-                                <DropdownItem key={tv.TVA1}>{tv.TVA1}</DropdownItem>
-                              ))
-                            }
-                        </DropdownMenu>
-                      </Dropdown>
-                    </div>
+                      <div className="dropdown-container w-[300px]">
+                            <Select
+                              options={tva?.map((tv)=>(
+                                {value:tv.TVA1,label:tv.TVA1}
+                              ))}
+                              placeholder="Select tva2"
+                              value={selectedKeysTva2}
+                              onChange={(data)=>setSelectedKeysTva2(data)}
+                              isSearchable={true}
+                            />
+                          </div>
                     </div>
                     <Input isDisabled={disabled}   label="Tx marge" value={txmarge} onValueChange={setTxmarge} placeholder="Enter your pays" type="text" />
                 </div>
@@ -703,253 +541,122 @@ const FormArticle = ({article,disabled}) => {
               <div className="flex flex-col gap-4 h-fit border p-2 py-5 border-slate-400 rounded-xl">
               <div className="flex flex-col gap-4 h-fit border p-2 py-5 border-slate-400 rounded-xl">
               <h2 className=' font-medium text-sm '>Parametres</h2>
-              <div className='flex justify-between'>
                       <div className="flex gap-3 items-center px-2">
-                        <h3 className='font-medium text-sm '><pre>Secteur :</pre></h3>
-                        <Dropdown>
-                          <DropdownTrigger disabled={disabled}>
-                              <Button 
-                              variant="bordered" 
-                              className="capitalize px-16"
-                              >
-                              {selectedValueSecteur}
-                              </Button>
-                          </DropdownTrigger>
-                          <DropdownMenu 
-                              aria-label="Single selection actions"
-                              variant="flat"
-                              disallowEmptySelection
-                              selectionMode="single"
-                              selectedKeys={selectedKeysSecteur}
-                              onSelectionChange={setSelectedKeysSecteur}
-                              aria-disabled={disabled}
-                          >
-                            {
-                              secteur?.map((sec)=>(
-                                <DropdownItem key={`${sec.ref_dep}_${sec.departem}`}>{`${sec.ref_dep}_${sec.departem}`}</DropdownItem>
-                              ))
-                            }
-                          </DropdownMenu>
-                        </Dropdown>
-                      </div>
+                        <h3 className='font-medium text-sm '><pre>Secteur     :</pre></h3>
+                        <div className="dropdown-container w-[300px]">
+                            <Select
+                              options={secteur?.map((sec)=>(
+                                {value:sec.ref_dep,label:sec.departem}
+                              ))}
+                              placeholder="Select a secteur"
+                              value={selectedKeysSecteur}
+                              onChange={(data)=>setSelectedKeysSecteur(data)}
+                              isSearchable={true}
+                            />
+                          </div>
                     </div>
-              <div className='flex justify-between'>
                       <div className="flex gap-3 items-center px-2">
-                        <h3 className='font-medium text-sm '><pre>Rayon :</pre></h3>
-                        <Dropdown>
-                          <DropdownTrigger disabled={disabled}>
-                              <Button 
-                              variant="bordered" 
-                              className="capitalize px-16"
-                              >
-                              {selectedValueRayon}
-                              </Button>
-                          </DropdownTrigger>
-                          <DropdownMenu 
-                              aria-label="Single selection actions"
-                              variant="flat"
-                              disallowEmptySelection
-                              selectionMode="single"
-                              selectedKeys={selectedKeysRayon}
-                              onSelectionChange={setSelectedKeysRayon}
-                              aria-disabled={disabled}
-                          >
-                            {
-                              rayon?.map((ray)=>(
-                                <DropdownItem key={`${ray.REF_RAY}_${ray.RAYON}`}>{`${ray.REF_RAY}_${ray.RAYON}`}</DropdownItem>
-                              ))
-                            }
-                          </DropdownMenu>
-                        </Dropdown>
-                      </div>
+                        <h3 className='font-medium text-sm '><pre>Rayon       :</pre></h3>
+                        <div className="dropdown-container w-[300px]">
+                            <Select
+                              options={rayon?.map((ray)=>(
+                                {value:ray.REF_RAY,label:ray.RAYON}
+                              ))}
+                              placeholder="Select a rayon"
+                              value={selectedKeysRayon}
+                              onChange={(data)=>setSelectedKeysRayon(data)}
+                              isSearchable={true}
+                            />
+                          </div>
                     </div>
-              <div className='flex justify-between'>
                       <div className="flex gap-3 items-center px-2">
-                        <h3 className='font-medium text-sm '><pre>Sous rayon :</pre></h3>
-                        <Dropdown>
-                          <DropdownTrigger disabled={disabled}>
-                              <Button 
-                              variant="bordered" 
-                              className="capitalize px-16"
-                              >
-                              {selectedValueSrayon}
-                              </Button>
-                          </DropdownTrigger>
-                          <DropdownMenu 
-                              aria-label="Single selection actions"
-                              variant="flat"
-                              disallowEmptySelection
-                              selectionMode="single"
-                              selectedKeys={selectedKeysSrayon}
-                              onSelectionChange={setSelectedKeysSrayon}
-                              aria-disabled={disabled}
-                          >
-                            {
-                              srayon?.map((sray)=>(
-                                <DropdownItem key={`${sray.REF_SRAY}_${sray.SRAYON}`}>{`${sray.REF_SRAY}_${sray.SRAYON}`}</DropdownItem>
-                              ))
-                            }
-                          </DropdownMenu>
-                        </Dropdown>
-                      </div>
+                        <h3 className='font-medium text-sm '><pre>Sous rayon  :</pre></h3>
+                        <div className="dropdown-container w-[300px]">
+                            <Select
+                              options={srayon?.map((sray)=>(
+                                {value:sray.REF_SRAY,label:sray.SRAYON}
+                              ))}
+                              placeholder="Select srayon"
+                              value={selectedKeysSrayon}
+                              onChange={(data)=>setSelectedKeysSrayon(data)}
+                              isSearchable={true}
+                            />
+                          </div>
                     </div>
-              <div className='flex justify-between'>
                       <div className="flex gap-3 items-center px-2">
-                        <h3 className='font-medium text-sm '><pre>Famille :</pre></h3>
-                        <Dropdown>
-                          <DropdownTrigger disabled={disabled}>
-                              <Button 
-                              variant="bordered" 
-                              className="capitalize px-16"
-                              >
-                              {selectedValueFamille}
-                              </Button>
-                          </DropdownTrigger>
-                          <DropdownMenu 
-                              aria-label="Single selection actions"
-                              variant="flat"
-                              disallowEmptySelection
-                              selectionMode="single"
-                              selectedKeys={selectedKeysFamille}
-                              onSelectionChange={setSelectedKeysFamille}
-                              aria-disabled={disabled}
-                          >
-                            {
-                              famille?.map((famil)=>(
-                                <DropdownItem key={`${famil.ref_fam}_${famil.FAMILLE}`}>{`${famil.ref_fam}_${famil.FAMILLE}`}</DropdownItem>
-                              ))
-                            }
-                          </DropdownMenu>
-                        </Dropdown>
-                      </div>
+                        <h3 className='font-medium text-sm '><pre>Famille     :</pre></h3>
+                        <div className="dropdown-container w-[300px]">
+                            <Select
+                              options={famille?.map((famil)=>(
+                                {value:famil.ref_fam,label:famil.FAMILLE}
+                              ))}
+                              placeholder="Select srayon"
+                              value={selectedKeysFamille}
+                              onChange={(data)=>setSelectedKeysFamille(data)}
+                              isSearchable={true}
+                            />
+                          </div>
                     </div>
-              <div className='flex justify-between'>
                       <div className="flex gap-3 items-center px-2">
                         <h3 className='font-medium text-sm '><pre>Sousfamille :</pre></h3>
-                        <Dropdown>
-                          <DropdownTrigger disabled={disabled}>
-                              <Button 
-                              variant="bordered" 
-                              className="capitalize px-16"
-                              >
-                              {selectedValueSfamille}
-                              </Button>
-                          </DropdownTrigger>
-                          <DropdownMenu 
-                              aria-label="Single selection actions"
-                              variant="flat"
-                              disallowEmptySelection
-                              selectionMode="single"
-                              className='max-h-[200px] overflow-y-scroll'
-                              selectedKeys={selectedKeysSfamille}
-                              onSelectionChange={setSelectedKeysSfamille}
-                              aria-disabled={disabled}
-                          >
-                            {
-                              sfamille?.map((sfamil)=>(
-                                <DropdownItem key={`${sfamil.ref_sfam}_${sfamil.SFAMILLE}`}>{`${sfamil.ref_sfam}_${sfamil.SFAMILLE}`}</DropdownItem>
-                              ))
-                            }
-                          </DropdownMenu>
-                        </Dropdown>
+                        <div className="dropdown-container w-[300px]">
+                            <Select
+                              options={sfamille?.map((sfamil)=>(
+                                {value:sfamil.ref_sfam,label:sfamil.SFAMILLE}
+                              ))}
+                              placeholder="Select sous famille"
+                              value={selectedKeysSfamille}
+                              onChange={(data)=>setSelectedKeysSfamille(data)}
+                              isSearchable={true}
+                            />
+                          </div>
                       </div>
-                    </div>
-              <div className='flex justify-between'>
                       <div className="flex gap-3 items-center px-2">
-                        <h3 className='font-medium text-sm '><pre>Segment :</pre></h3>
-                        <Dropdown>
-                          <DropdownTrigger disabled={disabled}>
-                              <Button 
-                              variant="bordered" 
-                              className="capitalize px-16"
-                              >
-                              {selectedValueSegment}
-                              </Button>
-                          </DropdownTrigger>
-                          <DropdownMenu 
-                              aria-label="Single selection actions"
-                              className='max-h-[200px] overflow-y-scroll'
-                              variant="flat"
-                              disallowEmptySelection
-                              selectionMode="single"
-                              selectedKeys={selectedKeysSegment}
-                              onSelectionChange={setSelectedKeysSegment}
-                              aria-disabled={disabled}
-                          >
-                            {
-                              segment?.map((seg)=>(
-                                <DropdownItem key={`${seg.ref_ssfam}_${seg.SSFAMILLE}`}>{`${seg.ref_ssfam}_${seg.SSFAMILLE}`}</DropdownItem>
-                              ))
-                            }
-                          </DropdownMenu>
-                        </Dropdown>
+                        <h3 className='font-medium text-sm '><pre>Segment     :</pre></h3>
+                        <div className="dropdown-container w-[300px]">
+                            <Select
+                              options={segment?.map((seg)=>(
+                                {value:seg.ref_ssfam,label:seg.SSFAMILLE}
+                              ))}
+                              placeholder="Select srayon"
+                              value={selectedKeysSegment}
+                              onChange={(data)=>setSelectedKeysSegment(data)}
+                              isSearchable={true}
+                            />
+                          </div>
                       </div>
-                    </div>
 
                 
               </div>
               <div className="flex flex-col gap-4 h-fit border p-2 py-5 border-slate-400 rounded-xl">
               <h2 className=' font-medium text-sm '>Autre parametres</h2>
-                <div className='flex justify-between'>
                       <div className="flex gap-3 items-center px-2">
-                        <h3 className='font-medium text-sm '><pre>Activite :</pre></h3>
-                        <Dropdown>
-                          <DropdownTrigger disabled={disabled}>
-                              <Button 
-                              variant="bordered" 
-                              className="capitalize px-16"
-                              >
-                              {selectedValueActivite}
-                              </Button>
-                          </DropdownTrigger>
-                          <DropdownMenu 
-                              aria-label="Single selection actions"
-                              variant="flat"
-                              disallowEmptySelection
-                              selectionMode="single"
-                              selectedKeys={selectedKeysActivite}
-                              onSelectionChange={setSelectedKeysActivite}
-                              aria-disabled={disabled}
-                          >
-                            {
-                              activite?.map((acti)=>(
-                                <DropdownItem key={`${acti.REFACTIVITE}_${acti.ACTIVITE}`}>{`${acti.REFACTIVITE}_${acti.ACTIVITE}`}</DropdownItem>
-                              ))
-                            }
-                          </DropdownMenu>
-                        </Dropdown>
+                        <h3 className='font-medium text-sm '><pre>Activite    :</pre></h3>
+                        <div className="dropdown-container w-[300px]">
+                            <Select
+                              options={activite?.map((activ)=>(
+                                {value:activ.REFACTIVITE,label:activ.ACTIVITE}
+                              ))}
+                              placeholder="Select activite"
+                              value={selectedKeysActivite}
+                              onChange={(data)=>setSelectedKeysActivite(data)}
+                              isSearchable={true}
+                            />
+                          </div>
                       </div>
-                    </div>
-                    <div className='flex justify-between'>
                       <div className="flex gap-3 items-center px-2">
-                        <h3 className='font-medium text-sm '><pre>Saison :</pre></h3>
-                        <Dropdown>
-                          <DropdownTrigger disabled={disabled}>
-                              <Button 
-                              variant="bordered" 
-                              className="capitalize px-16"
-                              >
-                              {selectedValueSaison}
-                              </Button>
-                          </DropdownTrigger>
-                          <DropdownMenu 
-                              aria-label="Single selection actions"
-                              className='max-h-[200px] overflow-y-scroll'
-                              variant="flat"
-                              disallowEmptySelection
-                              selectionMode="single"
-                              selectedKeys={selectedKeysSaison}
-                              onSelectionChange={setSelectedKeysSaison}
-                              aria-disabled={disabled}
-                          >
-                            {
-                              saison?.map((sais)=>(
-                                <DropdownItem key={`${sais.REFSAISON}_${sais.SAISON}`}>{`${sais.REFSAISON}_${sais.SAISON}`}</DropdownItem>
-                              ))
-                            }
-                          </DropdownMenu>
-                        </Dropdown>
-                      </div>
+                        <h3 className='font-medium text-sm '><pre>Saison      :</pre></h3>
+                        <div className="dropdown-container w-[300px]">
+                            <Select
+                              options={saison?.map((sais)=>(
+                                {value:sais.REFSAISON,label:sais.SAISON}
+                              ))}
+                              placeholder="Select saison"
+                              value={selectedKeysSaison}
+                              onChange={(data)=>setSelectedKeysSaison(data)}
+                              isSearchable={true}
+                            />
+                          </div>
                     </div>
                 <div className="flex justify-between gap-6">
                   <Input isDisabled={disabled}   label="Libre1" value={libre1} onValueChange={setLibre1} placeholder="Enter a value" type="text" />
